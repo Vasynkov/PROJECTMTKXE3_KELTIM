@@ -9,14 +9,21 @@
 <body>
     <div class="overlay-dark"></div>
     
+    <!-- SMAN 4 Jakarta Logo (Floating Top Right) -->
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; text-align: center; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 15px; border: 3px solid var(--qz-light-purple); box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+        <img src="{{ school_logo }}" alt="Logo SMAN 4 Jakarta" style="width: 80px; height: auto;">
+        <p style="margin: 5px 0 0 0; font-size: 0.6em; color: var(--qz-purple); font-weight: bold;">SMAN 4 JAKARTA</p>
+    </div>
+
     <div class="container">
         <div class="qz-header">
             <div style="display: flex; align-items: center; gap: 10px;">
-                <img src="{{ school_logo }}" alt="Logo" class="school-logo">
-                <h3 style="margin: 0;">{{ school_name }}</h3>
+                <span style="font-size: 1.5em;">🏫</span>
+                <h3 style="margin: 0; font-size: 0.9em;">X-E3 Kelompok TIM</h3>
             </div>
-            <div>
-                <span id="player-count">500+ Players Joined</span>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span>👥 1,240 Players</span>
+                <span>🏆 Top 1%</span>
             </div>
         </div>
 
