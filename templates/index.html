@@ -9,70 +9,74 @@
 <body>
     <div class="overlay-dark"></div>
     
-    <!-- SMAN 4 Jakarta Logo (Floating Top Right) -->
-    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; text-align: center; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 15px; border: 3px solid var(--qz-light-purple); box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
-        <img src="{{ school_logo }}" alt="Logo SMAN 4 Jakarta" style="width: 80px; height: auto;">
-        <p style="margin: 5px 0 0 0; font-size: 0.6em; color: var(--qz-purple); font-weight: bold;">SMAN 4 JAKARTA</p>
+    <!-- SMAN 4 Jakarta Logo (Cyber Style) -->
+    <div class="school-logo-container">
+        <img src="{{ school_logo }}" alt="Logo SMAN 4 Jakarta" style="width: 70px; height: auto; filter: drop-shadow(0 0 5px var(--cyber-cyan));">
+        <p style="margin: 5px 0 0 0; font-size: 0.6em; color: var(--cyber-cyan); font-weight: bold; font-family: 'Orbitron';">SMAN 4 JAKARTA</p>
     </div>
 
     <div class="container">
         <div class="qz-header">
             <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 1.5em;">🏫</span>
-                <h3 style="margin: 0; font-size: 0.9em;">X-E3 Kelompok TIM</h3>
+                <span style="font-size: 1.5em; filter: drop-shadow(0 0 5px var(--cyber-pink));">🌌</span>
+                <h3 style="margin: 0; font-size: 0.8em; font-family: 'Orbitron';">CYBER QUEST V.2</h3>
             </div>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <span>👥 1,240 Players</span>
-                <span>🏆 Top 1%</span>
+            <div style="display: flex; align-items: center; gap: 15px; font-size: 0.8em;">
+                <span style="color: var(--cyber-green);">● ONLINE</span>
+                <span style="color: var(--cyber-yellow);">ID: TIM_XE3</span>
             </div>
         </div>
 
-        <div class="qz-card" style="text-align: center;">
-            <h1 style="color: var(--qz-light-purple); font-size: 2.5em; text-shadow: 2px 2px 0px rgba(0,0,0,0.1);">TRIGO QUEST</h1>
-            <p style="color: #666; font-weight: bold;">Quizizz Edition - X-E3 Kelompok TIM</p>
+        <div class="qz-card cyber-border" style="text-align: center;">
+            <h1 class="glitch-text" style="font-size: 3em; margin-bottom: 0.2em;">TRIGO QUEST</h1>
+            <p style="color: var(--cyber-cyan); font-weight: bold; text-transform: uppercase; letter-spacing: 5px;">Digital Learning Experience</p>
             
             <div style="margin: 40px 0;">
                 <form action="{{ url_for('start_game') }}" method="POST">
-                    <div style="margin-bottom: 20px;">
-                        <input type="text" name="player_name" placeholder="Enter your name..." required 
-                               style="width: 80%; padding: 15px; border-radius: 10px; border: 2px solid #ddd; font-size: 1.2em; text-align: center; font-family: 'Quicksand', sans-serif;">
+                    <div style="margin-bottom: 25px; position: relative;">
+                        <input type="text" name="player_name" placeholder="ENTER AVATAR NAME..." required 
+                               style="width: 85%; padding: 18px; border-radius: 12px; border: 2px solid var(--cyber-cyan); background: rgba(0,0,0,0.5); color: var(--cyber-cyan); font-size: 1.2em; text-align: center; font-family: 'Orbitron', sans-serif; outline: none; box-shadow: 0 0 10px rgba(0,255,255,0.2);">
                     </div>
-                    <button type="submit" class="btn-qz btn-start">START GAME</button>
-                    <div style="margin-top: 15px;">
-                        <a href="{{ url_for('learn') }}" class="btn-qz btn-learn" style="width: 80%;">LEARN MATERIAL</a>
+                    <button type="submit" class="btn-qz btn-start">INITIALIZE GAME</button>
+                    <div style="margin-top: 20px;">
+                        <a href="{{ url_for('learn') }}" class="btn-qz btn-learn" style="width: 85%;">AI STUDY MODE</a>
                     </div>
                 </form>
             </div>
         </div>
 
         <div class="qz-card">
-            <h3 style="text-align: center; color: var(--qz-light-purple);">TOP LEADERBOARD</h3>
-            <table class="sb-table">
-                <thead>
-                    <tr>
-                        <th>RANK</th>
-                        <th>NAME</th>
-                        <th>SCORE</th>
-                        <th>TIME</th>
-                    </tr>
-                </thead>
-                <tbody id="score-body">
-                    <!-- Loaded via JS -->
-                </tbody>
-            </table>
+            <h3 style="text-align: center; color: var(--cyber-pink); margin-bottom: 20px;">GLOBAL LEADERBOARD</h3>
+            <div style="overflow-x: auto;">
+                <table class="sb-table" style="width: 100%; border-collapse: separate; border-spacing: 0 10px;">
+                    <thead>
+                        <tr style="color: var(--cyber-cyan); text-transform: uppercase; font-size: 0.8em;">
+                            <th style="padding: 10px;">Rank</th>
+                            <th style="padding: 10px;">User</th>
+                            <th style="padding: 10px;">Score</th>
+                            <th style="padding: 10px;">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="score-body">
+                        <!-- Loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <div style="text-align: center; margin-top: 30px; font-size: 0.9em; color: white; opacity: 0.8;">
-            <p>Developed by: <strong>Gilang Satria Pratama</strong> & Kelompok TIM</p>
-            <p>SMAN 4 Jakarta | 2026</p>
-            <a href="{{ url_for('admin_login') }}" style="color: white; text-decoration: none; opacity: 0.3;">Admin</a>
+        <div style="text-align: center; margin-top: 40px; font-size: 0.8em; color: rgba(255,255,255,0.5); font-family: 'Orbitron';">
+            <p>AUTH_SERVER: CRY-X-E3-SMAN4-2026</p>
+            <p>DEV: GILANG SATRIA PRATAMA</p>
+            <div style="margin-top: 10px; display: flex; justify-content: center; gap: 20px;">
+                <a href="{{ url_for('admin_login') }}" style="color: inherit; text-decoration: none;">ADMIN</a>
+                <a href="{{ url_for('easter_egg') }}" style="color: inherit; text-decoration: none;">SECRET</a>
+            </div>
         </div>
     </div>
 
     <!-- Anime Mascot -->
-    <div class="anime-character">
-        <div class="anime-speech">"Ayo tunjukkan kemampuan trigonometrimu!"</div>
-        <img src="https://www.pngarts.com/files/12/Anime-Girl-Holding-Book-PNG-Photo.png" alt="Mascot" style="width: 100%;">
+    <div class="anime-mascot">
+        <img src="https://www.pngarts.com/files/12/Anime-Girl-Holding-Book-PNG-Photo.png" alt="Mascot" style="width: 100%; filter: drop-shadow(0 0 10px var(--cyber-pink));">
     </div>
 
     <script>
@@ -81,15 +85,15 @@
             .then(data => {
                 const body = document.getElementById('score-body');
                 if (data.length === 0) {
-                    body.innerHTML = '<tr><td colspan="4">No scores yet. Be the first!</td></tr>';
+                    body.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #666;">No data found.</td></tr>';
                     return;
                 }
                 data.forEach((score, index) => {
-                    const row = `<tr>
-                        <td>${index + 1}</td>
-                        <td>${score.name}</td>
-                        <td>${score.score}</td>
-                        <td>${score.time_taken}s</td>
+                    const row = `<tr style="background: rgba(255,255,255,0.05); border-radius: 10px;">
+                        <td style="padding: 15px; text-align: center; color: var(--cyber-yellow); font-weight: bold;">#${index + 1}</td>
+                        <td style="padding: 15px; text-align: center; font-weight: bold;">${score.name}</td>
+                        <td style="padding: 15px; text-align: center; color: var(--cyber-green);">${score.score}</td>
+                        <td style="padding: 15px; text-align: center; color: var(--cyber-cyan);">${score.time_taken}s</td>
                     </tr>`;
                     body.innerHTML += row;
                 });

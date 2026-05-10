@@ -5,8 +5,17 @@ import sqlite3
 import random
 import time
 from werkzeug.security import generate_password_hash, check_password_hash
+import google.generativeai as genai
 
 load_dotenv()
+
+# Configure Gemini AI
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel('gemini-pro')
+else:
+    model = None
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'cryesix_ultra_secure_key_2026')
@@ -17,10 +26,6 @@ DB_PATH = os.path.join(BASE_DIR, os.getenv('DATABASE_URL', 'trigonometri.db'))
 
 # --- Java-Style Backend Engine Class ---
 class TrigonometryEngine:
-    """
-    A Java-inspired Engine class to handle core game logic.
-    Provides a more structured and complex architecture.
-    """
     def __init__(self, db_path):
         self.db_path = db_path
 
@@ -33,8 +38,7 @@ class TrigonometryEngine:
         conn = self.get_connection()
         try:
             all_q = conn.execute('SELECT * FROM questions').fetchall()
-            if len(all_q) < count:
-                count = len(all_q)
+            if len(all_q) < count: count = len(all_q)
             selected = random.sample(all_q, count)
             return [dict(q) for q in selected]
         finally:
@@ -59,11 +63,7 @@ class TrigonometryEngine:
 
 engine = TrigonometryEngine(DB_PATH)
 
-# --- Security & Admin Logic ---
-ADMIN_USER = os.getenv('ADMIN_USERNAME', 'admin')
-# Default hashed password for 'password' if not set in .env
-DEFAULT_HASH = generate_password_hash(os.getenv('ADMIN_PASSWORD', 'password'))
-
+# --- Routes ---
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -72,11 +72,24 @@ def home():
 def learn():
     return render_template('learn.html')
 
+@app.route('/api/gemini_study', methods=['POST'])
+def gemini_study():
+    if not model:
+        return jsonify({"summary": "Gemini API Key tidak terdeteksi. Silakan hubungi admin untuk aktivasi fitur AI!"})
+    
+    topic = request.json.get('topic', 'Trigonometri dasar')
+    prompt = f"Berikan penjelasan singkat dan super menarik ala guru matematika gaul tentang {topic}. Sertakan tips cepat untuk menghafal rumus. Gunakan bahasa Indonesia yang santai tapi edukatif."
+    
+    try:
+        response = model.generate_content(prompt)
+        return jsonify({"summary": response.text})
+    except Exception as e:
+        return jsonify({"summary": f"Gagal menghubungi Gemini: {str(e)}"})
+
 @app.route('/start_game', methods=['POST'])
 def start_game():
     name = request.form.get('player_name')
-    if not name:
-        name = "Guest Player"
+    if not name: name = "Guest Player"
     
     session['player_name'] = name
     session['score'] = 0
@@ -103,8 +116,7 @@ def game():
     idx = session['current_q_idx']
     total = session.get('total_questions', 20)
     
-    if idx >= total:
-        return redirect(url_for('finish'))
+    if idx >= total: return redirect(url_for('finish'))
     
     q_id = session['question_indices'][idx]
     conn = engine.get_connection()
@@ -140,8 +152,7 @@ def submit_answer():
         if active_pu == 'Double Points': points *= 2
         session['score'] += (points + bonus)
     else:
-        if active_pu != 'Shield':
-            session['streak'] = 0
+        if active_pu != 'Shield': session['streak'] = 0
             
     session['active_power_up'] = None
     session['current_q_idx'] += 1
@@ -176,14 +187,16 @@ def finish():
     accuracy = (correct / total) * 100 if total > 0 else 0
     
     engine.save_score(player_name, score, time_taken, accuracy)
-    
     return render_template('finish.html', name=player_name, score=score, time=time_taken, acc=accuracy, correct=correct, total=total)
 
 @app.route('/scoreboard_data')
 def scoreboard_data():
     return jsonify(engine.get_top_scores())
 
-# --- Advanced Admin Security ---
+# --- Admin Section ---
+ADMIN_USER = os.getenv('ADMIN_USERNAME', 'admin')
+DEFAULT_HASH = generate_password_hash(os.getenv('ADMIN_PASSWORD', 'password'))
+
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
@@ -191,42 +204,21 @@ def admin_login():
         pwd = request.form.get('password')
         if usn == ADMIN_USER and check_password_hash(DEFAULT_HASH, pwd):
             session['admin'] = True
-            session['admin_last_login'] = time.time()
             return redirect(url_for('admin_dashboard'))
-        else:
-            return render_template('admin_login.html', error="Invalid Credentials!")
+        return render_template('admin_login.html', error="Invalid Credentials!")
     return render_template('admin_login.html')
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    if not session.get('admin'):
-        return redirect(url_for('admin_login'))
+    if not session.get('admin'): return redirect(url_for('admin_login'))
     conn = engine.get_connection()
     scores = conn.execute('SELECT * FROM scoreboard ORDER BY date_played DESC').fetchall()
     conn.close()
     return render_template('admin_dashboard.html', scores=scores)
 
-@app.route('/api/ai_summary', methods=['POST'])
-def ai_summary():
-    summary = (
-        "STRATEGI TRIGONOMETRI TINGKAT LANJUT:\n"
-        "1. Identitas Pythagoras (sin²x + cos²x = 1) adalah basis semua penyelesaian.\n"
-        "2. Di Kuadran II, III, dan IV, selalu tentukan tanda (+/-) sebelum menghitung nilai.\n"
-        "3. Gunakan relasi (180±α) atau (360-α) untuk menyederhanakan sudut besar.\n"
-        "4. Hafalkan tabel sudut istimewa 0-90° sebagai fondasi utama."
-    )
-    return jsonify({"summary": summary})
-
-# --- Expanded Easter Eggs ---
 @app.route('/easter_egg')
 def easter_egg():
     return render_template('easter_egg.html')
-
-@app.route('/secret_console')
-def secret_console():
-    if session.get('player_name') == "cryesix_":
-        return "Welcome Master. System Overclocked."
-    return "Access Denied.", 403
 
 @app.context_processor
 def inject_school_info():
@@ -234,8 +226,12 @@ def inject_school_info():
         "school_logo": "/static/img/logo_sman4.jpeg",
         "school_name": "SMAN 4 Jakarta",
         "school_loc": "Jl. Batu III No. 3, Gambir, Jakarta Pusat",
-        "project_title": "TrigoQuest: Professional Edition"
+        "project_title": "TrigoQuest Cyber-Quizizz"
     }
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

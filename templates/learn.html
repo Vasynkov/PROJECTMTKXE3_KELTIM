@@ -91,23 +91,53 @@
                 </div>
             </div>
 
+            <div class="qz-card cyber-border">
+                <h3 style="color: var(--cyber-cyan); text-align: center; font-family: 'Orbitron';"><span style="font-size: 1.2em;">🤖</span> GEMINI AI STUDY ASSISTANT</h3>
+                <p style="font-size: 0.9em; text-align: center; color: #999;">Tanya apapun tentang Trigonometri atau minta ringkasan cepat!</p>
+                
+                <div style="margin-top: 20px;">
+                    <input type="text" id="ai-topic" placeholder="Contoh: Rumus Sinus Kuadran II..." 
+                           style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--cyber-cyan); background: rgba(0,0,0,0.3); color: white; margin-bottom: 15px; outline: none;">
+                    <button id="ai-ask-btn" class="btn-qz btn-learn" style="width: 100%;">TANYA GEMINI AI</button>
+                </div>
+
+                <div id="ai-response-box" class="ai-panel" style="display: none; margin-top: 20px; font-size: 1em; line-height: 1.5; color: #eee; max-height: 300px; overflow-y: auto;">
+                    <!-- AI Result -->
+                </div>
+            </div>
+
             <div style="margin-top: 30px;">
-                <a href="{{ url_for('home') }}" class="btn-qz btn-start" style="width: 100%;">KEMBALI KE LOBBY GAME</a>
+                <a href="{{ url_for('home') }}" class="btn-qz btn-start" style="width: 100%;">BACK TO LOBBY</a>
             </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('ai-btn').onclick = function() {
-            this.innerText = "SEDANG MENGANALISIS...";
-            fetch('/api/ai_summary', {method: 'POST'})
-                .then(r => r.json())
-                .then(data => {
-                    const res = document.getElementById('ai-result');
-                    res.innerText = "RINGKASAN UNTUK UJIAN:\n" + data.summary + "\n\nFokuslah pada latihan soal Quadrant II dan IV karena sering menjebak di tanda (+/-)!";
-                    res.style.display = 'block';
-                    this.innerText = "REFRESH ANALISIS";
-                });
+        document.getElementById('ai-ask-btn').onclick = function() {
+            const topic = document.getElementById('ai-topic').value || 'Trigonometri';
+            const resBox = document.getElementById('ai-response-box');
+            
+            this.innerText = "PROCESSING...";
+            this.disabled = true;
+            
+            fetch('/api/gemini_study', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({topic: topic})
+            })
+            .then(r => r.json())
+            .then(data => {
+                resBox.style.display = 'block';
+                resBox.innerText = data.summary;
+                this.innerText = "TANYA GEMINI AI";
+                this.disabled = false;
+            })
+            .catch(err => {
+                resBox.style.display = 'block';
+                resBox.innerText = "Error: Pastikan API Key Gemini sudah terpasang di server.";
+                this.innerText = "TANYA GEMINI AI";
+                this.disabled = false;
+            });
         };
     </script>
 </body>

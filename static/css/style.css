@@ -1,295 +1,195 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Quicksand:wght@400;700&display=swap');
 
 :root {
     --qz-purple: #461a42;
     --qz-light-purple: #8854c0;
-    --qz-dark-purple: #2d033b;
-    --qz-red: #eb670f;
-    --qz-blue: #2d9da6;
-    --qz-green: #66bf3c;
-    --qz-yellow: #f2a900;
+    --cyber-pink: #ff00ff;
+    --cyber-cyan: #00ffff;
+    --cyber-yellow: #f2f200;
+    --cyber-green: #39ff14;
     --qz-white: #ffffff;
-    --qz-gray: #f2f2f2;
-    --text-dark: #222222;
+    --text-dark: #1a1a1a;
+    --panel-blur: rgba(26, 26, 46, 0.85);
 }
 
 body {
     margin: 0;
     padding: 0;
-    background-color: var(--qz-purple);
+    background-color: #0b0e14;
     color: var(--qz-white);
     font-family: 'Quicksand', sans-serif;
-    background-image: url('https://wallpaperaccess.com/full/1154341.jpg'); /* Anime landscape background */
+    background-image: linear-gradient(rgba(11, 14, 20, 0.8), rgba(11, 14, 20, 0.8)), url('https://wallpaperaccess.com/full/1154341.jpg');
     background-size: cover;
     background-attachment: fixed;
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
-.overlay-dark {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(45, 3, 59, 0.7);
-    z-index: -1;
+.cyber-border {
+    border: 2px solid var(--cyber-cyan);
+    box-shadow: 0 0 15px var(--cyber-cyan), inset 0 0 5px var(--cyber-cyan);
+    position: relative;
+    overflow: hidden;
+}
+
+.cyber-border::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    animation: scanline 4s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes scanline {
+    0% { transform: translateY(-100%) rotate(45deg); }
+    100% { transform: translateY(100%) rotate(45deg); }
 }
 
 .container {
-    max-width: 900px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
-    position: relative;
-    z-index: 1;
 }
 
 .qz-card {
-    background: var(--qz-white);
-    color: var(--text-dark);
-    border-radius: 15px;
+    background: var(--panel-blur);
+    border-radius: 20px;
     padding: 30px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    margin-bottom: 25px;
 }
 
 .qz-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(0,0,0,0.5);
-    padding: 10px 20px;
+    background: rgba(136, 84, 192, 0.2);
+    padding: 12px 25px;
     border-radius: 50px;
-    margin-bottom: 20px;
+    border: 1px solid var(--qz-light-purple);
+    margin-bottom: 30px;
 }
 
 h1, h2, h3 {
-    margin-top: 0;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
-.school-logo {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 3px solid var(--qz-light-purple);
-    background: white;
+.glitch-text {
+    position: relative;
+    color: var(--qz-white);
+    text-shadow: 2px 2px var(--cyber-pink), -2px -2px var(--cyber-cyan);
 }
 
 .btn-qz {
-    padding: 15px 30px;
+    padding: 15px 35px;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     font-weight: bold;
     font-size: 1.1em;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-transform: uppercase;
     display: inline-block;
     text-decoration: none;
     text-align: center;
-}
-
-.btn-qz:active {
-    transform: scale(0.95);
+    font-family: 'Orbitron', sans-serif;
 }
 
 .btn-start {
-    background: var(--qz-green);
-    color: white;
-    box-shadow: 0 5px 0 #4a8c2c;
-    width: 100%;
-    margin-top: 20px;
+    background: var(--cyber-green);
+    color: #000;
+    box-shadow: 0 0 15px var(--cyber-green);
+}
+
+.btn-start:hover {
+    transform: scale(1.05) translateY(-3px);
+    box-shadow: 0 0 25px var(--cyber-green);
 }
 
 .btn-learn {
-    background: var(--qz-blue);
-    color: white;
-    box-shadow: 0 5px 0 #1e6d73;
+    background: var(--cyber-cyan);
+    color: #000;
+    box-shadow: 0 0 15px var(--cyber-cyan);
 }
 
-/* Game Styles */
-.progress-container {
-    width: 100%;
-    height: 10px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 5px;
-    margin-bottom: 20px;
-    overflow: hidden;
+.btn-learn:hover {
+    transform: scale(1.05) translateY(-3px);
+    box-shadow: 0 0 25px var(--cyber-cyan);
 }
 
-.progress-bar {
-    height: 100%;
-    background: var(--qz-yellow);
-    transition: width 0.3s ease;
-}
-
-.question-text {
-    font-size: 1.5em;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 30px;
-}
-
+/* Question Grid */
 .options-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 20px;
 }
 
 .option-card {
-    padding: 20px;
-    border-radius: 10px;
+    padding: 25px;
+    border-radius: 15px;
     color: white;
     font-weight: bold;
-    font-size: 1.2em;
+    font-size: 1.3em;
     cursor: pointer;
-    border: none;
+    border: 2px solid rgba(255,255,255,0.1);
     text-align: center;
-    transition: filter 0.2s;
+    transition: all 0.2s;
+    background: rgba(255,255,255,0.05);
 }
 
-.option-card:hover {
-    filter: brightness(1.1);
+.opt-0:hover { background: var(--qz-blue); border-color: var(--cyber-cyan); box-shadow: 0 0 20px var(--cyber-cyan); }
+.opt-1:hover { background: var(--qz-red); border-color: var(--cyber-pink); box-shadow: 0 0 20px var(--cyber-pink); }
+.opt-2:hover { background: var(--qz-yellow); border-color: var(--cyber-yellow); box-shadow: 0 0 20px var(--cyber-yellow); }
+.opt-3:hover { background: var(--qz-green); border-color: var(--cyber-green); box-shadow: 0 0 20px var(--cyber-green); }
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+    .options-grid { grid-template-columns: 1fr; gap: 12px; }
+    .qz-card { padding: 20px; }
+    .btn-qz { width: 100%; padding: 12px; font-size: 1em; }
+    .school-logo-container { transform: scale(0.7); top: 10px !important; right: 10px !important; }
+    h1 { font-size: 1.5em; }
 }
 
-.opt-0 { background-color: var(--qz-blue); box-shadow: 0 5px 0 #1e6d73; }
-.opt-1 { background-color: var(--qz-red); box-shadow: 0 5px 0 #b34e0b; }
-.opt-2 { background-color: var(--qz-yellow); box-shadow: 0 5px 0 #b37d00; }
-.opt-3 { background-color: var(--qz-green); box-shadow: 0 5px 0 #4a8c2c; }
-
-/* Power-ups */
-.powerups-bar {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.powerup-icon {
-    width: 60px;
-    height: 60px;
-    background: var(--qz-light-purple);
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.6em;
-    cursor: pointer;
-    border: 2px solid white;
-    transition: transform 0.2s;
-}
-
-.powerup-icon:hover {
-    transform: translateY(-5px);
-}
-
-.powerup-icon.used {
-    filter: grayscale(1);
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Feedback Modal */
-.modal-content {
-    background: var(--qz-white);
-    color: var(--text-dark);
-    padding: 30px;
-    border-radius: 20px;
-    text-align: center;
-}
-
-.correct-bg { background-color: var(--qz-green) !important; color: white !important; }
-.wrong-bg { background-color: var(--qz-red) !important; color: white !important; }
-
-/* Scoreboard */
-.sb-table {
-    width: 100%;
-    background: white;
-    color: black;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.sb-table th {
-    background: var(--qz-light-purple);
-    color: white;
-    padding: 15px;
-}
-
-.sb-table td {
+/* School Branding */
+.school-logo-container {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    z-index: 1000;
+    background: var(--panel-blur);
     padding: 10px;
+    border-radius: 20px;
+    border: 2px solid var(--cyber-cyan);
     text-align: center;
-    border-bottom: 1px solid #ddd;
+}
+
+/* AI Assistant */
+.ai-panel {
+    border-left: 4px solid var(--cyber-cyan);
+    background: rgba(0, 255, 255, 0.05);
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 0 15px 15px 0;
 }
 
 /* Anime Elements */
-.anime-character {
+.anime-mascot {
     position: fixed;
-    bottom: 0;
-    right: 20px;
-    width: 250px;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0.8;
+    bottom: -20px;
+    left: 20px;
+    width: 200px;
+    z-index: 5;
+    transition: transform 0.3s;
 }
 
-.anime-speech {
-    position: absolute;
-    bottom: 180px;
-    right: 150px;
-    background: white;
-    color: black;
-    padding: 10px;
-    border-radius: 10px;
-    width: 150px;
-    font-size: 0.8em;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.anime-speech:after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    right: 20px;
-    border-width: 10px 10px 0;
-    border-style: solid;
-    border-color: white transparent;
-}
-
-@media (max-width: 600px) {
-    .options-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-    .anime-character {
-        display: none;
-    }
-    .qz-card {
-        padding: 15px;
-        border-radius: 10px;
-    }
-    .question-text {
-        font-size: 1.2em;
-        margin-bottom: 20px;
-    }
-    .option-card {
-        padding: 15px;
-        font-size: 1em;
-    }
-    .container {
-        padding: 10px;
-    }
-    .qz-header {
-        padding: 5px 15px;
-        font-size: 0.8em;
-    }
-    .powerup-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 0.5em;
-    }
-    .school-logo {
-        width: 40px;
-        height: 40px;
-    }
-}
+.anime-mascot:hover { transform: translateY(-10px) rotate(5deg); }
