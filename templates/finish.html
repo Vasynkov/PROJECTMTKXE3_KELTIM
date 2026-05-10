@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Selesai - {{ project_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container" style="text-align: center;">
+        <div class="cyber-panel">
+            <h1 class="flicker">MISI SELESAI!</h1>
+            <h2>Skor Akhir: {{ score }}</h2>
+            <div style="margin: 20px 0; font-size: 1.2em;">
+                <p>Pemain: <strong>{{ name }}</strong></p>
+                <p>Waktu Total: {{ time }} detik</p>
+                <p>Akurasi: {{ acc }}%</p>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <img src="https://media.tenor.com/2A6_68i7S4IAAAAC/anime-cheer.gif" width="200" style="border: 2px solid var(--neon-blue);">
+            </div>
+
+            <div style="margin-top: 30px;">
+                <a href="{{ url_for('home') }}" class="btn btn-primary">MAIN LAGI</a>
+                <a href="{{ url_for('home') }}" class="btn btn-secondary">KE SCOREBOARD</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

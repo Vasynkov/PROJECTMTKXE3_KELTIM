@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Easter Egg - {{ info.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container" style="max-width: 600px; text-align: center;">
+        <div class="cyber-panel" style="border-color: #ff0055; box-shadow: 0 0 20px #ff0055;">
+            <h1 class="flicker" style="color: #ff0055;">ACCESS GRANTED</h1>
+            <h3>THE ARCHITECT</h3>
+            <div style="margin: 20px 0;">
+                <img src="https://avatars.githubusercontent.com/u/991900?v=4" alt="Gilang Placeholder" style="width: 200px; border-radius: 50%; border: 4px solid var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue);">
+            </div>
+            <h2>{{ info.name }}</h2>
+            <p style="color: var(--neon-blue);">@{{ info.username }}</p>
+            <p style="font-style: italic; margin-top: 15px;">"{{ info.bio }}"</p>
+            
+            <div style="margin-top: 30px;">
+                <a href="{{ info.ig_link }}" target="_blank" class="btn btn-primary">VISIT INSTAGRAM</a>
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 0.8em; opacity: 0.6;">
+                <p>This is a secret page for the programmer of this project.</p>
+                <p>SMAN 4 Jakarta - Class X-E3</p>
+            </div>
+
+            <a href="{{ url_for('home') }}" class="btn btn-secondary" style="margin-top: 20px;">BACK TO REALITY</a>
+        </div>
+    </div>
+</body>
+</html>

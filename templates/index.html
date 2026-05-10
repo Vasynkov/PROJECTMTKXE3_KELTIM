@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <img src="{{ school_logo }}" alt="Logo SMAN 4 Jakarta" class="school-logo">
+
+    <div class="container">
+        <div class="cyber-panel" style="text-align: center;">
+            <h1 class="flicker">TRIGO QUEST X-E3</h1>
+            <p style="color: var(--neon-blue);">Cyberpunk Educational Game & Flashcards</p>
+            <p>Materi: Kuadran Trigonometri & Sudut Istimewa</p>
+
+            <div style="margin: 40px 0;">
+                <form action="{{ url_for('start_game') }}" method="POST">
+                    <input type="text" name="player_name" placeholder="Masukkan Namamu..." required 
+                           style="background: transparent; border: 1px solid var(--neon-blue); color: white; padding: 10px; margin-bottom: 20px; width: 80%; text-align: center;">
+                    <br>
+                    <button type="submit" class="btn btn-primary">MULAI GAME</button>
+                    <a href="{{ url_for('learn') }}" class="btn btn-secondary">BELAJAR MATERI</a>
+                </form>
+            </div>
+
+            <div style="font-size: 0.8em; opacity: 0.7;">
+                <p>Bersiaplah menghadapi 20 soal tantangan dari level Easy ke Advanced!</p>
+            </div>
+        </div>
+
+        <div class="cyber-panel">
+            <h3>SCOREBOARD TERATAS</h3>
+            <table class="scoreboard-table" id="top-scores">
+                <thead>
+                    <tr>
+                        <th>Peringkat</th>
+                        <th>Nama</th>
+                        <th>Skor</th>
+                        <th>Waktu (s)</th>
+                    </tr>
+                </thead>
+                <tbody id="score-body">
+                    <!-- Loaded via JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="credits">
+            <p>Dibuat oleh Kelompok Taman Ismail Marzuki (TIM):</p>
+            <ul class="credits-list">
+                <li>1. Aira Adekha Anfi (2)</li>
+                <li>2. Gilang Satria Pratama (10)</li>
+                <li>3. Irsanny Fadhil Kurnaefi (13)</li>
+                <li>4. Jafier Yusuf Putera (14)</li>
+                <li>5. Labib Lawahizh Ramadhani (18)</li>
+                <li>6. M. Atallah Rizal (20)</li>
+                <li>7. Raffi Putra Dwi Cahyana (26)</li>
+                <li>8. Shafira Bilqies Dermawan (30)</li>
+            </ul>
+            <p>Disusun dan diprogram oleh: <strong>Gilang Satria Pratama (10)</strong></p>
+            <p>Murid <strong>SMAN 4 Jakarta</strong> with love.</p>
+            <p style="font-size: 0.7em;">{{ school_loc }}</p>
+            
+            <div style="margin-top: 20px;">
+                <a href="{{ url_for('admin_login') }}" style="opacity: 0.2; font-size: 0.5em; text-decoration: none; color: white;">Admin Access</a>
+                | <a href="{{ url_for('easter_egg') }}" style="opacity: 0.2; font-size: 0.5em; text-decoration: none; color: white;">??</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        fetch('/scoreboard_data')
+            .then(response => response.json())
+            .then(data => {
+                const body = document.getElementById('score-body');
+                data.forEach((score, index) => {
+                    const row = `<tr>
+                        <td>${index + 1}</td>
+                        <td>${score.name}</td>
+                        <td>${score.score}</td>
+                        <td>${score.time_taken}</td>
+                    </tr>`;
+                    body.innerHTML += row;
+                });
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+:root {
+    --bg-color: #0d0221;
+    --neon-pink: #ff00ff;
+    --neon-blue: #00ffff;
+    --neon-green: #39ff14;
+    --text-color: #ffffff;
+    --panel-bg: rgba(20, 20, 40, 0.8);
+    --accent-color: #f706cf;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://w0.peakpx.com/wallpaper/146/473/HD-wallpaper-cyberpunk-2077-neon-city-cityscape-sci-fi-games.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.cyber-panel {
+    background: var(--panel-bg);
+    border: 2px solid var(--neon-blue);
+    box-shadow: 0 0 15px var(--neon-blue);
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    backdrop-filter: blur(5px);
+}
+
+h1, h2, h3 {
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px var(--neon-pink);
+}
+
+.school-logo {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 80px;
+    height: auto;
+    border: 2px solid var(--neon-blue);
+    padding: 5px;
+    background: white;
+    z-index: 1000;
+}
+
+.btn {
+    padding: 12px 30px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    margin: 10px;
+    border-radius: 5px;
+}
+
+.btn-primary {
+    background: var(--neon-blue);
+    color: #000;
+    box-shadow: 0 0 10px var(--neon-blue);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 0 20px var(--neon-blue);
+    transform: scale(1.05);
+}
+
+.btn-secondary {
+    background: var(--neon-pink);
+    color: #fff;
+    box-shadow: 0 0 10px var(--neon-pink);
+}
+
+.btn-secondary:hover {
+    box-shadow: 0 0 20px var(--neon-pink);
+    transform: scale(1.05);
+}
+
+/* Question Styling */
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.option-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--neon-blue);
+    color: white;
+    padding: 15px;
+    text-align: left;
+    transition: 0.3s;
+}
+
+.option-btn:hover {
+    background: rgba(0, 255, 255, 0.2);
+}
+
+.clue-box {
+    margin-top: 20px;
+    padding: 15px;
+    border-left: 5px solid var(--neon-green);
+    background: rgba(57, 255, 20, 0.1);
+    font-style: italic;
+}
+
+/* Credits Section */
+.credits {
+    font-size: 0.9em;
+    text-align: center;
+    border-top: 1px solid var(--neon-blue);
+    padding-top: 20px;
+    margin-top: 50px;
+}
+
+.credits-list {
+    list-style: none;
+    padding: 0;
+}
+
+/* Animations */
+@keyframes neon-flicker {
+    0% { opacity: 1; }
+    50% { opacity: 0.8; }
+    100% { opacity: 1; }
+}
+
+.flicker {
+    animation: neon-flicker 2s infinite;
+}
+
+/* Scoreboard */
+.scoreboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.scoreboard-table th, .scoreboard-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+    text-align: center;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .options-grid {
+        grid-template-columns: 1fr;
+    }
+    .school-logo {
+        width: 50px;
+    }
+}

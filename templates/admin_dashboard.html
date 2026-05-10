@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - {{ project_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="cyber-panel">
+            <h2>ADMIN DASHBOARD - PROGRESS PEMAIN</h2>
+            <table class="scoreboard-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama</th>
+                        <th>Skor</th>
+                        <th>Waktu (s)</th>
+                        <th>Akurasi (%)</th>
+                        <th>Tanggal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for score in scores %}
+                    <tr>
+                        <td>{{ score.id }}</td>
+                        <td>{{ score.name }}</td>
+                        <td>{{ score.score }}</td>
+                        <td>{{ score.time_taken }}</td>
+                        <td>{{ score.accuracy }}</td>
+                        <td>{{ score.date_played }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <a href="{{ url_for('home') }}" class="btn btn-secondary">KEMBALI</a>
+        </div>
+    </div>
+</body>
+</html>
