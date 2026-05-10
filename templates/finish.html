@@ -3,80 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Finished - {{ project_title }}</title>
+    <title>Mission Success: {{ project_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </head>
 <body>
     <div class="overlay-dark"></div>
+    
+    <div class="school-logo-container">
+        <img src="{{ school_logo }}" alt="SMAN 4">
+    </div>
 
     <div class="container" style="text-align: center;">
-        <div class="qz-card">
-            <h1 style="color: var(--qz-light-purple);">GAME COMPLETED!</h1>
-            <div id="finish-anime" style="margin: 20px 0;">
-                <img src="https://media.tenor.com/images/5f0f3e3e3b3b3b3b3b3b3b3b3b3b3b3b/tenor.gif" width="200" alt="Anime Win" style="border-radius: 10px;">
+        <div class="qz-card cyber-border">
+            <h1 class="glitch-text" style="color: var(--cyber-yellow);">MISSION_COMPLETE</h1>
+            <div id="finish-anime" style="margin: 30px 0;">
+                <img src="https://media.tenor.com/images/5f0f3e3e3b3b3b3b3b3b3b3b3b3b3b3b/tenor.gif" width="220" style="border-radius: 15px; border: 3px solid var(--cyber-cyan);">
             </div>
             
-            <h2 style="font-size: 2em; margin-bottom: 0;">{{ name }}</h2>
-            <p style="color: #666; margin-top: 5px;">Great job completing the Trigo Quest!</p>
+            <h2 style="font-size: 2.5em; margin-bottom: 5px; font-family: 'Orbitron';">{{ name }}</h2>
+            <p style="color: var(--cyber-cyan); letter-spacing: 2px;">DATA_SYNCHRONIZATION_COMPLETE</p>
 
-            <div style="display: flex; justify-content: space-around; margin: 30px 0;">
-                <div>
-                    <h3 style="margin: 0; color: var(--qz-yellow);">{{ score }}</h3>
-                    <p style="margin: 0; font-size: 0.8em;">TOTAL SCORE</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin: 40px 0;">
+                <div style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 10px; border: 1px solid var(--cyber-cyan);">
+                    <h3 style="margin: 0; color: var(--cyber-yellow);">{{ score }}</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 0.7em;">TOTAL_SCORE</p>
                 </div>
-                <div>
-                    <h3 style="margin: 0; color: var(--qz-green);">{{ acc }}%</h3>
-                    <p style="margin: 0; font-size: 0.8em;">ACCURACY</p>
+                <div style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 10px; border: 1px solid var(--cyber-green);">
+                    <h3 style="margin: 0; color: var(--cyber-green);">{{ acc|round(1) }}%</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 0.7em;">ACCURACY</p>
                 </div>
-                <div>
-                    <h3 style="margin: 0; color: var(--qz-blue);">{{ time }}s</h3>
-                    <p style="margin: 0; font-size: 0.8em;">TIME TAKEN</p>
+                <div style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 10px; border: 1px solid var(--cyber-pink);">
+                    <h3 style="margin: 0; color: var(--cyber-pink);">{{ time }}s</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 0.7em;">ELAPSED_TIME</p>
                 </div>
             </div>
 
-            <div style="margin: 20px 0; padding: 15px; background: var(--qz-gray); border-radius: 10px;">
-                <span style="font-weight: bold;">Correct: {{ correct }} / {{ total }}</span>
+            <div style="margin-bottom: 40px; font-weight: bold; font-size: 1.2em;">
+                <span style="color: var(--cyber-cyan);">VERDICT:</span> 
+                {% if acc > 80 %} S-RANK WARRIOR {% elif acc > 50 %} A-RANK SOLDIER {% else %} RECRUIT_LEVEL {% endif %}
             </div>
 
-            <div style="display: flex; gap: 10px; flex-direction: column;">
-                <a href="{{ url_for('home') }}" class="btn-qz btn-start">PLAY AGAIN</a>
-                <a href="{{ url_for('learn') }}" class="btn-qz btn-learn">STUDY MORE</a>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <a href="{{ url_for('home') }}" class="btn-qz btn-start">RE-INITIALIZE MISSION</a>
+                <a href="{{ url_for('learn') }}" class="btn-qz btn-learn">RETURN TO ARCHIVES</a>
             </div>
         </div>
 
-        <div class="qz-card">
-            <h3 style="color: var(--qz-light-purple);">YOUR STANDING</h3>
-            <div id="rank-info" style="font-size: 1.2em; font-weight: bold;">
-                Checking leaderboard...
-            </div>
+        <div class="qz-card" style="background: rgba(0,0,0,0.5);">
+            <h3 style="color: var(--cyber-pink); font-family: 'Orbitron';">GLOBAL_RANKING</h3>
+            <div id="ranking-status" style="font-size: 1.1em; color: #fff;">Synchronizing with central database...</div>
         </div>
     </div>
 
     <script>
-        confetti({
-            particleCount: 150,
-            spread: 100,
-            origin: { y: 0.6 }
-        });
-
-        // Small delay to let DB update
-        setTimeout(() => {
-            fetch('/scoreboard_data')
-                .then(r => r.json())
-                .then(data => {
-                    const name = "{{ name }}";
-                    const score = {{ score }};
-                    const rankInfo = document.getElementById('rank-info');
-                    
-                    const myRank = data.findIndex(s => s.name === name && s.score === score) + 1;
-                    if (myRank > 0) {
-                        rankInfo.innerHTML = `You are currently ranked <span style="color: var(--qz-yellow);">#${myRank}</span> on the leaderboard!`;
-                    } else {
-                        rankInfo.innerText = "Keep playing to reach the top 10!";
-                    }
-                });
-        }, 1000);
+        confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
+        
+        fetch('/scoreboard_data')
+            .then(r => r.json())
+            .then(data => {
+                const myName = "{{ name }}";
+                const myScore = {{ score }};
+                const status = document.getElementById('ranking-status');
+                const rank = data.findIndex(s => s.name === myName && s.score === myScore) + 1;
+                
+                if(rank > 0) {
+                    status.innerHTML = `You are currently positioned at <span style="color:var(--cyber-yellow)">#${rank}</span> globally.`;
+                } else {
+                    status.innerText = "Keep training to enter the Top 10 Elite.";
+                }
+            });
     </script>
 </body>
 </html>

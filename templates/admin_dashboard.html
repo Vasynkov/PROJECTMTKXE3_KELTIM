@@ -2,39 +2,44 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard - {{ project_title }}</title>
+    <title>Admin Intel: {{ project_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <div class="overlay-dark"></div>
     <div class="container">
-        <div class="cyber-panel">
-            <h2>ADMIN DASHBOARD - PROGRESS PEMAIN</h2>
-            <table class="scoreboard-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nama</th>
-                        <th>Skor</th>
-                        <th>Waktu (s)</th>
-                        <th>Akurasi (%)</th>
-                        <th>Tanggal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for score in scores %}
-                    <tr>
-                        <td>{{ score.id }}</td>
-                        <td>{{ score.name }}</td>
-                        <td>{{ score.score }}</td>
-                        <td>{{ score.time_taken }}</td>
-                        <td>{{ score.accuracy }}</td>
-                        <td>{{ score.date_played }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <br>
-            <a href="{{ url_for('home') }}" class="btn btn-secondary">KEMBALI</a>
+        <div class="qz-card cyber-border">
+            <h1 style="color: var(--cyber-pink); font-family: 'Orbitron';">ADMIN_COMMAND_CENTER</h1>
+            <p style="color: #999;">Welcome back, Commander. Monitoring user performance metrics...</p>
+
+            <div style="margin-top: 30px; overflow-x: auto;">
+                <table class="sb-table" style="width: 100%; border-collapse: separate; border-spacing: 0 10px;">
+                    <thead>
+                        <tr style="color: var(--cyber-cyan); text-transform: uppercase; font-size: 0.8em;">
+                            <th style="padding: 15px;">Date</th>
+                            <th style="padding: 15px;">User_ID</th>
+                            <th style="padding: 15px;">Final_Score</th>
+                            <th style="padding: 15px;">Accuracy</th>
+                            <th style="padding: 15px;">Latency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in scores %}
+                        <tr style="background: rgba(255,255,255,0.05);">
+                            <td style="padding: 15px; font-size: 0.8em;">{{ row.date_played }}</td>
+                            <td style="padding: 15px; font-weight: bold;">{{ row.name }}</td>
+                            <td style="padding: 15px; color: var(--cyber-yellow);">{{ row.score }}</td>
+                            <td style="padding: 15px; color: var(--cyber-green);">{{ row.accuracy|round(1) }}%</td>
+                            <td style="padding: 15px; color: var(--cyber-cyan);">{{ row.time_taken }}s</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 40px;">
+                <a href="{{ url_for('home') }}" class="btn-qz btn-start" style="width: 100%;">DE-AUTHORIZE & EXIT</a>
+            </div>
         </div>
     </div>
 </body>

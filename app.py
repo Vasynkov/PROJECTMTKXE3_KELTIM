@@ -1,73 +1,98 @@
 import os
-from dotenv import load_dotenv
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 import sqlite3
 import random
 import time
+from dotenv import load_dotenv
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 import google.generativeai as genai
 
+# --- 1. ENVIRONMENT & SECURITY CONFIGURATION ---
 load_dotenv()
 
-# Configure Gemini AI
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-pro')
-else:
-    model = None
-
 app = Flask(__name__)
-app.secret_key = os.getenv('FLASK_SECRET_KEY', 'cryesix_ultra_secure_key_2026')
+# Secret key is pulled from environment for security
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_fallback_secure_key_2026')
 
-# Robust Database Path for Local and Vercel
+# Secure Admin Configuration
+ADMIN_USER = os.getenv('ADMIN_USERNAME', 'admin')
+# Use a pre-generated hash or generate one from the .env password
+ADMIN_PWD_PLAIN = os.getenv('ADMIN_PASSWORD', 'password')
+ADMIN_PWD_HASH = generate_password_hash(ADMIN_PWD_PLAIN)
+
+# Gemini AI Configuration
+GEMINI_KEY = os.getenv('GEMINI_API_KEY')
+if GEMINI_KEY:
+    genai.configure(api_key=GEMINI_KEY)
+    ai_model = genai.GenerativeModel('gemini-pro')
+else:
+    ai_model = None
+
+# Database Path - Optimized for Vercel
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'trigonometri.db')
 
-class TrigonometryEngine:
-    def __init__(self, db_path):
-        self.db_path = db_path
+# --- 2. HIGH-PERFORMANCE DATABASE ENGINE ---
+class TrigoEngine:
+    """
+    Optimized for high-concurrency environments like Vercel.
+    Uses context managers and careful error handling to prevent locks.
+    """
+    def __init__(self, path):
+        self.path = path
 
-    def get_connection(self):
-        # On Vercel, the DB is read-only. We try to connect normally.
-        # If it fails with "unable to open database file", it might be a path issue.
-        return sqlite3.connect(self.db_path)
+    def get_conn(self, read_only=True):
+        # On some environments, we use uri=True for shared cache or read-only modes
+        if read_only:
+            # Open in read-only mode to prevent 'database is locked' errors under high load
+            return sqlite3.connect(f"file:{self.path}?mode=ro", uri=True)
+        return sqlite3.connect(self.path)
 
-    def fetch_questions(self, count=20):
-        conn = self.get_connection()
+    def fetch_all_questions(self):
+        conn = self.get_conn(read_only=True)
         conn.row_factory = sqlite3.Row
         try:
-            all_q = conn.execute('SELECT * FROM questions').fetchall()
-            if not all_q: return []
-            actual_count = min(len(all_q), count)
-            selected = random.sample(all_q, actual_count)
-            return [dict(q) for q in selected]
+            cursor = conn.cursor()
+            return [dict(row) for row in cursor.execute("SELECT * FROM questions").fetchall()]
         finally:
             conn.close()
 
-    def save_score(self, name, score, time_taken, accuracy):
+    def get_question_by_id(self, q_id):
+        conn = self.get_conn(read_only=True)
+        conn.row_factory = sqlite3.Row
         try:
-            conn = self.get_connection()
-            conn.execute('INSERT INTO scoreboard (name, score, time_taken, accuracy) VALUES (?, ?, ?, ?)',
+            row = conn.execute("SELECT * FROM questions WHERE id = ?", (q_id,)).fetchone()
+            return dict(row) if row else None
+        finally:
+            conn.close()
+
+    def submit_score(self, name, score, time_taken, accuracy):
+        # Vercel filesystem is read-only; persistent writes to SQLite will fail.
+        # We catch the error to keep the app running for the user.
+        try:
+            conn = self.get_conn(read_only=False)
+            conn.execute("INSERT INTO scoreboard (name, score, time_taken, accuracy) VALUES (?, ?, ?, ?)",
                          (name, score, time_taken, accuracy))
             conn.commit()
             conn.close()
+            return True
         except Exception as e:
-            print(f"Score saving ignored (possibly read-only FS): {e}")
+            print(f"[DB LOG] Persistent write failed (Expected on Vercel): {e}")
+            return False
 
-    def get_top_scores(self, limit=10):
+    def get_leaderboard(self, limit=10):
         try:
-            conn = self.get_connection()
+            conn = self.get_conn(read_only=True)
             conn.row_factory = sqlite3.Row
-            scores = conn.execute('SELECT * FROM scoreboard ORDER BY score DESC, time_taken ASC LIMIT ?', (limit,)).fetchall()
+            rows = conn.execute("SELECT * FROM scoreboard ORDER BY score DESC, time_taken ASC LIMIT ?", (limit,)).fetchall()
             conn.close()
-            return [dict(s) for s in scores]
+            return [dict(r) for row in rows]
         except:
             return []
 
-engine = TrigonometryEngine(DB_PATH)
+engine = TrigoEngine(DB_PATH)
 
-# Member List
+# --- 3. PROJECT DATA ---
 GROUP_MEMBERS = [
     {"name": "Aira Adekha Anfi", "no": 2},
     {"name": "Gilang Satria Pratama", "no": 10},
@@ -79,6 +104,7 @@ GROUP_MEMBERS = [
     {"name": "Shafira Bilqies Dermawan", "no": 30}
 ]
 
+# --- 4. CORE ROUTES ---
 @app.route('/')
 def home():
     return render_template('index.html', members=GROUP_MEMBERS)
@@ -87,136 +113,158 @@ def home():
 def learn():
     return render_template('learn.html', members=GROUP_MEMBERS)
 
-@app.route('/api/gemini_study', methods=['POST'])
-def gemini_study():
-    if not model:
-        return jsonify({"summary": "Gemini AI is currently offline. Please check API settings."})
-    topic = request.json.get('topic', 'Trigonometri Kuadran')
-    prompt = f"Jelaskan materi tentang {topic} secara mendalam sesuai kurikulum matematika SMA. Berikan contoh soal dan tips menghafal. Gunakan bahasa Indonesia."
-    try:
-        response = model.generate_content(prompt)
-        return jsonify({"summary": response.text})
-    except Exception as e:
-        return jsonify({"summary": f"AI Error: {str(e)}"})
-
 @app.route('/start_game', methods=['POST'])
 def start_game():
-    name = request.form.get('player_name', 'Guest Player')
-    session['player_name'] = name
+    player_name = request.form.get('player_name', 'Cyber Warrior')
+    session['player_name'] = player_name
     session['score'] = 0
     session['start_time'] = time.time()
     session['streak'] = 0
-    session['power_ups'] = ['Double Points', 'Eraser', 'Shield']
+    session['power_ups'] = ['50:50 Eraser', 'Double Points', 'Shield Pulse']
     session['active_power_up'] = None
     
     try:
-        questions = engine.fetch_questions(20)
-        if not questions:
-            return "Error: Database questions are empty or missing!", 500
-        session['question_indices'] = [q['id'] for q in questions]
-        session['total_questions'] = len(questions)
-        session['current_q_idx'] = 0
+        all_questions = engine.fetch_all_questions()
+        if not all_questions:
+            return "Fatal: Question pool empty.", 500
+        
+        # Pick 20 random questions
+        sample_size = min(20, len(all_questions))
+        selected = random.sample(all_questions, sample_size)
+        session['q_ids'] = [q['id'] for q in selected]
+        session['total_q'] = len(selected)
+        session['current_idx'] = 0
         session['correct_count'] = 0
         return redirect(url_for('game'))
     except Exception as e:
-        return f"Database Error: {e}. Path: {DB_PATH}", 500
+        return f"System Overload: {e}", 500
 
 @app.route('/game')
 def game():
-    if 'question_indices' not in session: return redirect(url_for('home'))
-    idx = session['current_q_idx']
-    total = session.get('total_questions', 0)
+    if 'q_ids' not in session: return redirect(url_for('home'))
+    idx = session['current_idx']
+    total = session['total_q']
+    
     if idx >= total: return redirect(url_for('finish'))
     
-    q_id = session['question_indices'][idx]
-    conn = engine.get_connection()
-    conn.row_factory = sqlite3.Row
-    question = conn.execute('SELECT * FROM questions WHERE id = ?', (q_id,)).fetchone()
-    conn.close()
-    return render_template('game.html', question=dict(question), q_num=idx+1, total_q=total,
-                           power_ups=session.get('power_ups', []), streak=session.get('streak', 0), score=session.get('score', 0))
+    q_id = session['q_ids'][idx]
+    question = engine.get_question_by_id(q_id)
+    
+    return render_template('game.html', 
+                           question=question, 
+                           q_num=idx+1, 
+                           total_q=total,
+                           power_ups=session.get('power_ups'),
+                           streak=session.get('streak'),
+                           score=session.get('score'))
 
 @app.route('/submit_answer', methods=['POST'])
 def submit_answer():
-    user_answer = request.form.get('answer')
+    user_choice = request.form.get('answer')
     q_id = request.form.get('q_id')
-    conn = engine.get_connection()
-    conn.row_factory = sqlite3.Row
-    q = conn.execute('SELECT * FROM questions WHERE id = ?', (q_id,)).fetchone()
-    conn.close()
+    q_data = engine.get_question_by_id(q_id)
     
-    is_correct = (user_answer == q['answer'])
-    points = 10
+    is_correct = (user_choice == q_data['answer'])
+    base_points = 10
     bonus = 0
+    
     active_pu = session.get('active_power_up')
     
     if is_correct:
         session['streak'] += 1
         session['correct_count'] += 1
-        if session['streak'] >= 3: bonus += 5
-        if active_pu == 'Double Points': points *= 2
-        session['score'] += (points + bonus)
+        if session['streak'] >= 3: bonus = 5
+        if active_pu == 'Double Points': base_points *= 2
+        session['score'] += (base_points + bonus)
     else:
-        if active_pu != 'Shield': session['streak'] = 0
+        if active_pu != 'Shield Pulse': session['streak'] = 0
+            
     session['active_power_up'] = None
-    session['current_q_idx'] += 1
+    session['current_idx'] += 1
     session.modified = True
-    return jsonify({"correct": is_correct, "answer": q['answer'], "explanation": q['explanation'],
-                    "score": session['score'], "streak": session['streak'], "points_gained": points + bonus if is_correct else 0})
+    
+    return jsonify({
+        "correct": is_correct,
+        "answer": q_data['answer'],
+        "explanation": q_data['explanation'],
+        "score": session['score'],
+        "streak": session['streak'],
+        "points_gained": (base_points + bonus) if is_correct else 0
+    })
 
 @app.route('/use_powerup', methods=['POST'])
 def use_powerup():
-    power_up = request.json.get('power_up')
-    if power_up in session.get('power_ups', []):
-        session['active_power_up'] = power_up
-        session['power_ups'].remove(power_up)
+    pu_name = request.json.get('power_up')
+    if pu_name in session.get('power_ups', []):
+        session['active_power_up'] = pu_name
+        session['power_ups'].remove(pu_name)
         session.modified = True
-        return jsonify({"success": True, "message": f"{power_up} Activated!"})
+        return jsonify({"success": True})
     return jsonify({"success": False})
 
 @app.route('/finish')
 def finish():
-    player_name = session.get('player_name', 'Guest')
+    name = session.get('player_name', 'Guest')
     score = session.get('score', 0)
-    time_taken = round(time.time() - session.get('start_time', time.time()), 2)
-    total = session.get('total_questions', 0)
+    duration = round(time.time() - session.get('start_time', time.time()), 2)
     correct = session.get('correct_count', 0)
-    accuracy = (correct / total) * 100 if total > 0 else 0
-    engine.save_score(player_name, score, time_taken, accuracy)
-    return render_template('finish.html', name=player_name, score=score, time=time_taken, acc=accuracy, correct=correct, total=total)
+    total = session.get('total_q', 1)
+    acc = (correct / total) * 100
+    
+    # Attempt to save to leaderboard (optional for Vercel)
+    engine.submit_score(name, score, duration, acc)
+    
+    return render_template('finish.html', name=name, score=score, time=duration, acc=acc, correct=correct, total=total)
+
+@app.route('/api/gemini_study', methods=['POST'])
+def gemini_study():
+    if not ai_model:
+        return jsonify({"summary": "AI module is currently offline. Please check server logs."})
+    topic = request.json.get('topic', 'Trigonometri')
+    prompt = f"Berikan penjelasan mendalam tentang {topic} untuk siswa SMA. Jelaskan konsep, rumus, dan berikan 1 contoh soal sulit beserta pembahasannya. Gunakan gaya bahasa yang mudah dimengerti."
+    try:
+        resp = ai_model.generate_content(prompt)
+        return jsonify({"summary": resp.text})
+    except Exception as e:
+        return jsonify({"summary": f"AI Error: {e}"})
 
 @app.route('/scoreboard_data')
 def scoreboard_data():
-    return jsonify(engine.get_top_scores())
+    return jsonify(engine.get_leaderboard())
 
+# --- 5. ADMIN & SECURITY ---
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
-        usn = request.form.get('username')
-        pwd = request.form.get('password')
-        admin_usn = os.getenv('ADMIN_USERNAME', 'admin')
-        admin_pwd = os.getenv('ADMIN_PASSWORD', 'password')
-        if usn == admin_usn and pwd == admin_pwd:
-            session['admin'] = True
+        u = request.form.get('username')
+        p = request.form.get('password')
+        if u == ADMIN_USER and check_password_hash(ADMIN_PWD_HASH, p):
+            session['admin_active'] = True
             return redirect(url_for('admin_dashboard'))
-        return render_template('admin_login.html', error="Invalid Access")
+        return render_template('admin_login.html', error="ACCESS DENIED")
     return render_template('admin_login.html')
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    if not session.get('admin'): return redirect(url_for('admin_login'))
-    conn = engine.get_connection()
-    scores = conn.execute('SELECT * FROM scoreboard ORDER BY date_played DESC').fetchall()
+    if not session.get('admin_active'): return redirect(url_for('admin_login'))
+    # Load all records
+    conn = engine.get_conn(read_only=True)
+    rows = conn.execute("SELECT * FROM scoreboard ORDER BY date_played DESC").fetchall()
     conn.close()
-    return render_template('admin_dashboard.html', scores=scores)
+    return render_template('admin_dashboard.html', scores=rows)
 
 @app.route('/easter_egg')
 def easter_egg():
     return render_template('easter_egg.html', members=GROUP_MEMBERS)
 
 @app.context_processor
-def inject_school_info():
-    return {"school_logo": "/static/img/logo_sman4.jpeg", "school_name": "SMAN 4 Jakarta", "project_title": "TrigoQuest TIM X-E3"}
+def inject_global_data():
+    return {
+        "school_logo": "/static/img/logo_sman4.jpeg",
+        "school_name": "SMAN 4 Jakarta",
+        "project_title": "TrigoQuest TIM X-E3"
+    }
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # Local production testing
+    app.run(host='0.0.0.0', port=5000, debug=False)

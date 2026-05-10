@@ -3,45 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Playing - {{ project_title }}</title>
+    <title>In-Game: {{ project_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 243, 255, 0.15);
+            padding: 10px 25px;
+            border-bottom: 2px solid var(--cyber-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9em;
+        }
+        .q-img-container {
+            text-align: center;
+            margin: 20px 0;
+            background: rgba(0,0,0,0.4);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--qz-light-purple);
+        }
+        .q-img-container img {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 5px;
+        }
+        .text-neon-glow {
+            color: #fff;
+            text-shadow: 0 0 10px var(--cyber-cyan);
+            font-weight: bold;
+        }
+    </style>
 </head>
-<body class="game-body">
-    <div class="overlay-dark"></div>
+<body>
+    <!-- Floating Logo -->
+    <div class="school-logo-container">
+        <img src="{{ school_logo }}" alt="SMAN 4">
+    </div>
 
-    <div class="container">
-        <!-- Top Stats Bar -->
-        <div class="qz-header" style="margin-top: 10px;">
-            <div style="color: white; font-weight: bold;">
-                <span style="color: var(--qz-yellow);">STREAK: {{ streak }} 🔥</span>
-            </div>
-            <div style="flex-grow: 1; margin: 0 20px;">
-                <div class="progress-container">
-                    <div class="progress-bar" style="width: {{ (q_num / total_q) * 100 }}%;"></div>
-                </div>
-            </div>
-            <div style="color: white; font-weight: bold;">
-                SCORE: <span id="current-score">{{ score }}</span>
+    <div class="game-header">
+        <div class="text-neon-glow">STREAK: {{ streak }} 🔥</div>
+        <div style="flex-grow: 1; margin: 0 30px;">
+            <div class="progress-container" style="height: 12px; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                <div class="progress-bar" style="width: {{ (q_num / total_q) * 100 }}%; height: 100%; background: var(--cyber-yellow); border-radius: 10px; box-shadow: 0 0 10px var(--cyber-yellow);"></div>
             </div>
         </div>
+        <div class="text-neon-glow">SCORE: {{ score }}</div>
+    </div>
 
-        <div id="game-card" class="qz-card" style="min-height: 400px; display: flex; flex-direction: column; justify-content: center; position: relative;">
-            <div style="position: absolute; top: 10px; left: 20px; font-size: 0.8em; color: #999;">
-                QUESTION {{ q_num }} OF {{ total_q }} | LEVEL: {{ question.difficulty }}
+    <div class="container">
+        <div class="qz-card cyber-border" style="position: relative;">
+            <div style="position: absolute; top: 10px; left: 20px; font-size: 0.7em; color: var(--cyber-cyan); font-family: 'Orbitron';">
+                LOG: QUESTION_{{ q_num }}/{{ total_q }}
             </div>
 
-            <div class="question-text">
+            <div class="question-text" style="margin-top: 20px; font-size: 1.4em; text-align: center; color: white;">
                 {{ question.question }}
             </div>
 
             {% if question.image_url %}
-            <div style="text-align: center; margin-bottom: 20px;">
-                <img src="{{ question.image_url }}" alt="Question Image" style="max-width: 100%; max-height: 200px; border-radius: 10px; border: 2px solid var(--qz-light-purple);">
+            <div class="q-img-container">
+                <img src="{{ question.image_url }}" alt="Question Visual" onerror="this.parentElement.style.display='none'">
             </div>
             {% endif %}
 
-            <div class="options-grid" id="options-container">
+            <div class="options-grid" id="options-box">
                 <button class="option-card opt-0" onclick="checkAnswer('{{ question.option_a }}')">{{ question.option_a }}</button>
                 <button class="option-card opt-1" onclick="checkAnswer('{{ question.option_b }}')">{{ question.option_b }}</button>
                 <button class="option-card opt-2" onclick="checkAnswer('{{ question.option_c }}')">{{ question.option_c }}</button>
@@ -49,65 +77,49 @@
             </div>
         </div>
 
-        <!-- Power-ups Bar -->
-        <div class="powerups-bar">
+        <!-- Power-ups -->
+        <div class="powerups-bar" style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
             {% for pu in power_ups %}
-            <div class="powerup-icon" id="pu-{{ loop.index }}" onclick="usePowerUp('{{ pu }}', this)">
-                <span style="font-size: 1.5em;">⚡</span>
-                <span>{{ pu }}</span>
+            <div class="powerup-icon" onclick="activatePU('{{ pu }}', this)" style="cursor: pointer;">
+                <span style="font-size: 1.2em;">⚡</span>
+                <span style="font-size: 0.8em; font-family: 'Orbitron';">{{ pu }}</span>
             </div>
             {% endfor %}
-            {% if not power_ups %}
-                <span style="opacity: 0.5;">No power-ups left</span>
-            {% endif %}
-        </div>
-
-        <div style="text-align: center; margin-top: 20px;">
-            <button class="btn-qz btn-learn" onclick="showHint()" style="font-size: 0.8em; padding: 10px 20px;">USE HINT</button>
-            <p id="hint-text" style="display: none; margin-top: 10px; color: #666; font-style: italic;">{{ question.clue }}</p>
         </div>
     </div>
 
-    <!-- Feedback Overlay -->
-    <div id="feedback-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; flex-direction: column; align-items: center; justify-content: center;">
-        <div id="feedback-content" class="modal-content" style="width: 80%; max-width: 400px; transform: scale(0.5); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-            <h1 id="feedback-title"></h1>
-            <div id="feedback-anime" style="margin: 20px 0;"></div>
-            <p id="feedback-msg"></p>
-            <p id="points-alert" style="font-weight: bold; font-size: 1.5em;"></p>
-            <button class="btn-qz btn-start" onclick="nextQuestion()">NEXT QUESTION</button>
+    <!-- Result Overlay -->
+    <div id="result-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
+        <div id="result-card" class="qz-card" style="width: 100%; max-width: 450px; text-align: center; transform: scale(0.5); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            <h1 id="result-title"></h1>
+            <div id="result-meme" style="margin: 20px 0;"></div>
+            <p id="result-msg" style="color: white;"></p>
+            <div id="points-notif" style="font-size: 2em; font-family: 'Orbitron'; font-weight: bold; margin: 15px 0;"></div>
+            <button class="btn-qz btn-start" onclick="nextQ()" style="width: 100%;">CONTINUE</button>
         </div>
     </div>
 
     <script>
-        let isAnswered = false;
+        let answered = false;
 
-        function showHint() {
-            document.getElementById('hint-text').style.display = 'block';
-        }
-
-        function usePowerUp(type, element) {
-            if (element.classList.contains('used')) return;
-
+        function activatePU(type, el) {
+            if (el.classList.contains('used')) return;
             fetch('/use_powerup', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({power_up: type})
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    element.classList.add('used');
-                    alert(data.message);
-                    if (type === 'Eraser') {
-                        // Logic to remove 2 wrong answers
-                        const correctAnswer = "{{ question.answer }}";
+            }).then(r => r.json()).then(d => {
+                if(d.success) {
+                    el.classList.add('used');
+                    el.style.opacity = '0.3';
+                    if(type === '50:50 Eraser') {
+                        const correct = "{{ question.answer }}";
                         const btns = document.querySelectorAll('.option-card');
-                        let removed = 0;
-                        btns.forEach(btn => {
-                            if (btn.innerText !== correctAnswer && removed < 2) {
-                                btn.style.visibility = 'hidden';
-                                removed++;
+                        let count = 0;
+                        btns.forEach(b => {
+                            if(b.innerText !== correct && count < 2) {
+                                b.style.visibility = 'hidden';
+                                count++;
                             }
                         });
                     }
@@ -115,53 +127,47 @@
             });
         }
 
-        function checkAnswer(answer) {
-            if (isAnswered) return;
-            isAnswered = true;
+        function checkAnswer(choice) {
+            if (answered) return;
+            answered = true;
 
-            const qId = "{{ question.id }}";
-            const formData = new FormData();
-            formData.append('answer', answer);
-            formData.append('q_id', qId);
+            const fd = new FormData();
+            fd.append('answer', choice);
+            fd.append('q_id', "{{ question.id }}");
 
-            fetch('/submit_answer', {
-                method: 'POST',
-                body: formData
-            })
+            fetch('/submit_answer', { method: 'POST', body: fd })
             .then(r => r.json())
             .then(data => {
-                const overlay = document.getElementById('feedback-overlay');
-                const content = document.getElementById('feedback-content');
-                const title = document.getElementById('feedback-title');
-                const anime = document.getElementById('feedback-anime');
-                const msg = document.getElementById('feedback-msg');
-                const points = document.getElementById('points-alert');
+                const overlay = document.getElementById('result-overlay');
+                const card = document.getElementById('result-card');
+                const title = document.getElementById('result-title');
+                const meme = document.getElementById('result-meme');
+                const msg = document.getElementById('result-msg');
+                const pts = document.getElementById('points-notif');
 
                 overlay.style.display = 'flex';
-                setTimeout(() => content.style.transform = 'scale(1)', 10);
+                setTimeout(() => card.style.transform = 'scale(1)', 10);
 
                 if (data.correct) {
-                    title.innerText = "EXCELLENT!";
-                    content.classList.add('correct-bg');
-                    anime.innerHTML = '<img src="https://media.tenor.com/y2976H9T_mQAAAAC/anime-smile.gif" width="200" style="border-radius: 10px;">';
-                    msg.innerText = "Your trigonometry knowledge is impressive!";
-                    points.innerText = `+${data.points_gained} POINTS`;
-                    confetti({
-                        particleCount: 100,
-                        spread: 70,
-                        origin: { y: 0.6 }
-                    });
+                    title.innerText = "CRITICAL HIT!";
+                    title.style.color = "var(--cyber-green)";
+                    meme.innerHTML = '<img src="https://media.tenor.com/y2976H9T_mQAAAAC/anime-smile.gif" width="180">';
+                    msg.innerText = "System calculations verified. Perfect accuracy!";
+                    pts.innerText = `+${data.points_gained} PTS`;
+                    pts.style.color = "var(--cyber-green)";
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 } else {
-                    title.innerText = "NOT QUITE!";
-                    content.classList.add('wrong-bg');
-                    anime.innerHTML = '<img src="https://media.tenor.com/9n9_6E2X7nAAAAAC/anime-shock.gif" width="200" style="border-radius: 10px;">';
-                    msg.innerText = `The correct answer was ${data.answer}. ${data.explanation}`;
-                    points.innerText = "STREAK LOST!";
+                    title.innerText = "SYSTEM ERROR";
+                    title.style.color = "var(--cyber-pink)";
+                    meme.innerHTML = '<img src="https://media.tenor.com/9n9_6E2X7nAAAAAC/anime-shock.gif" width="180">';
+                    msg.innerHTML = `Incorrect vector detected. Correct: <span style="color:var(--cyber-cyan)">${data.answer}</span><br><br>${data.explanation}`;
+                    pts.innerText = "STREAK LOST";
+                    pts.style.color = "var(--cyber-pink)";
                 }
             });
         }
 
-        function nextQuestion() {
+        function nextQ() {
             window.location.reload();
         }
     </script>
