@@ -2,67 +2,117 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Playing - {{ project_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </head>
-<body>
-    <img src="{{ school_logo }}" alt="Logo SMAN 4 Jakarta" class="school-logo">
+<body class="game-body">
+    <div class="overlay-dark"></div>
+
     <div class="container">
-        <div id="game-container" class="cyber-panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--neon-blue); padding-bottom: 10px; margin-bottom: 20px;">
-                <h3 id="progress">Soal #{{ q_num }} / 20</h3>
-                <h3 id="timer">Waktu: 0s</h3>
+        <!-- Top Stats Bar -->
+        <div class="qz-header" style="margin-top: 10px;">
+            <div style="color: white; font-weight: bold;">
+                <span style="color: var(--qz-yellow);">STREAK: {{ streak }} 🔥</span>
             </div>
-
-            <div class="difficulty-tag" style="color: var(--neon-green); font-size: 0.8em; margin-bottom: 10px;">
-                LEVEL: {{ question.difficulty }}
-            </div>
-
-            <h2 id="question-text">{{ question.question }}</h2>
-
-            <div class="options-grid">
-                <button class="btn option-btn" onclick="checkAnswer('{{ question.option_a }}')">{{ question.option_a }}</button>
-                <button class="btn option-btn" onclick="checkAnswer('{{ question.option_b }}')">{{ question.option_b }}</button>
-                <button class="btn option-btn" onclick="checkAnswer('{{ question.option_c }}')">{{ question.option_c }}</button>
-                <button class="btn option-btn" onclick="checkAnswer('{{ question.option_d }}')">{{ question.option_d }}</button>
-            </div>
-
-            <div id="clue-section" style="margin-top: 30px;">
-                <button class="btn btn-secondary" style="padding: 5px 15px; font-size: 0.8em;" onclick="showClue()">MINTA CLUE (Hint)</button>
-                <div id="clue-box" class="clue-box" style="display: none;">
-                    {{ question.clue }}
+            <div style="flex-grow: 1; margin: 0 20px;">
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: {{ (q_num / total_q) * 100 }}%;"></div>
                 </div>
             </div>
-
-            <!-- Power ups simulation UI -->
-            <div style="margin-top: 30px; display: flex; gap: 10px; opacity: 0.6;">
-                <div style="padding: 5px; border: 1px solid var(--neon-blue); font-size: 0.7em;">50:50 [READY]</div>
-                <div style="padding: 5px; border: 1px solid var(--neon-blue); font-size: 0.7em;">2x SCORE [READY]</div>
+            <div style="color: white; font-weight: bold;">
+                SCORE: <span id="current-score">{{ score }}</span>
             </div>
         </div>
 
-        <!-- Feedback Modal -->
-        <div id="feedback-modal" class="cyber-panel" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; width: 80%; max-width: 500px; text-align: center;">
-            <h2 id="feedback-title"></h2>
-            <p id="feedback-text"></p>
-            <div id="reaction-img" style="margin: 20px 0;"></div>
-            <button class="btn btn-primary" onclick="nextQuestion()">SOAL BERIKUTNYA</button>
+        <div id="game-card" class="qz-card" style="min-height: 400px; display: flex; flex-direction: column; justify-content: center; position: relative;">
+            <div style="position: absolute; top: 10px; left: 20px; font-size: 0.8em; color: #999;">
+                QUESTION {{ q_num }} OF {{ total_q }} | LEVEL: {{ question.difficulty }}
+            </div>
+
+            <div class="question-text">
+                {{ question.question }}
+            </div>
+
+            <div class="options-grid" id="options-container">
+                <button class="option-card opt-0" onclick="checkAnswer('{{ question.option_a }}')">{{ question.option_a }}</button>
+                <button class="option-card opt-1" onclick="checkAnswer('{{ question.option_b }}')">{{ question.option_b }}</button>
+                <button class="option-card opt-2" onclick="checkAnswer('{{ question.option_c }}')">{{ question.option_c }}</button>
+                <button class="option-card opt-3" onclick="checkAnswer('{{ question.option_d }}')">{{ question.option_d }}</button>
+            </div>
         </div>
-        <div id="overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1500;"></div>
+
+        <!-- Power-ups Bar -->
+        <div class="powerups-bar">
+            {% for pu in power_ups %}
+            <div class="powerup-icon" id="pu-{{ loop.index }}" onclick="usePowerUp('{{ pu }}', this)">
+                <span style="font-size: 1.5em;">⚡</span>
+                <span>{{ pu }}</span>
+            </div>
+            {% endfor %}
+            {% if not power_ups %}
+                <span style="opacity: 0.5;">No power-ups left</span>
+            {% endif %}
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="btn-qz btn-learn" onclick="showHint()" style="font-size: 0.8em; padding: 10px 20px;">USE HINT</button>
+            <p id="hint-text" style="display: none; margin-top: 10px; color: #666; font-style: italic;">{{ question.clue }}</p>
+        </div>
+    </div>
+
+    <!-- Feedback Overlay -->
+    <div id="feedback-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; flex-direction: column; align-items: center; justify-content: center;">
+        <div id="feedback-content" class="modal-content" style="width: 80%; max-width: 400px; transform: scale(0.5); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            <h1 id="feedback-title"></h1>
+            <div id="feedback-anime" style="margin: 20px 0;"></div>
+            <p id="feedback-msg"></p>
+            <p id="points-alert" style="font-weight: bold; font-size: 1.5em;"></p>
+            <button class="btn-qz btn-start" onclick="nextQuestion()">NEXT QUESTION</button>
+        </div>
     </div>
 
     <script>
-        let startTime = Date.now();
-        setInterval(() => {
-            const elapsed = Math.floor((Date.now() - startTime) / 1000);
-            document.getElementById('timer').innerText = `Waktu: ${elapsed}s`;
-        }, 1000);
+        let isAnswered = false;
 
-        function showClue() {
-            document.getElementById('clue-box').style.display = 'block';
+        function showHint() {
+            document.getElementById('hint-text').style.display = 'block';
+        }
+
+        function usePowerUp(type, element) {
+            if (element.classList.contains('used')) return;
+
+            fetch('/use_powerup', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({power_up: type})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    element.classList.add('used');
+                    alert(data.message);
+                    if (type === 'Eraser') {
+                        // Logic to remove 2 wrong answers
+                        const correctAnswer = "{{ question.answer }}";
+                        const btns = document.querySelectorAll('.option-card');
+                        let removed = 0;
+                        btns.forEach(btn => {
+                            if (btn.innerText !== correctAnswer && removed < 2) {
+                                btn.style.visibility = 'hidden';
+                                removed++;
+                            }
+                        });
+                    }
+                }
+            });
         }
 
         function checkAnswer(answer) {
+            if (isAnswered) return;
+            isAnswered = true;
+
             const qId = "{{ question.id }}";
             const formData = new FormData();
             formData.append('answer', answer);
@@ -74,25 +124,33 @@
             })
             .then(r => r.json())
             .then(data => {
-                const modal = document.getElementById('feedback-modal');
-                const overlay = document.getElementById('overlay');
+                const overlay = document.getElementById('feedback-overlay');
+                const content = document.getElementById('feedback-content');
                 const title = document.getElementById('feedback-title');
-                const text = document.getElementById('feedback-text');
-                const reaction = document.getElementById('reaction-img');
+                const anime = document.getElementById('feedback-anime');
+                const msg = document.getElementById('feedback-msg');
+                const points = document.getElementById('points-alert');
 
-                overlay.style.display = 'block';
-                modal.style.display = 'block';
+                overlay.style.display = 'flex';
+                setTimeout(() => content.style.transform = 'scale(1)', 10);
 
                 if (data.correct) {
-                    title.innerText = "BENAR! (NICE!)";
-                    title.style.color = "var(--neon-green)";
-                    text.innerText = "Kamu memang jago trigonometri!";
-                    reaction.innerHTML = '<img src="https://media.tenor.com/y2976H9T_mQAAAAC/anime-smile.gif" width="150">';
+                    title.innerText = "EXCELLENT!";
+                    content.classList.add('correct-bg');
+                    anime.innerHTML = '<img src="https://media.tenor.com/y2976H9T_mQAAAAC/anime-smile.gif" width="200" style="border-radius: 10px;">';
+                    msg.innerText = "Your trigonometry knowledge is impressive!";
+                    points.innerText = `+${data.points_gained} POINTS`;
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
                 } else {
-                    title.innerText = "SALAH! (Baka!)";
-                    title.style.color = "var(--neon-pink)";
-                    text.innerText = `Jawaban yang benar: ${data.answer}. \n ${data.explanation}`;
-                    reaction.innerHTML = '<img src="https://media.tenor.com/9n9_6E2X7nAAAAAC/anime-shock.gif" width="150">';
+                    title.innerText = "NOT QUITE!";
+                    content.classList.add('wrong-bg');
+                    anime.innerHTML = '<img src="https://media.tenor.com/9n9_6E2X7nAAAAAC/anime-shock.gif" width="200" style="border-radius: 10px;">';
+                    msg.innerText = `The correct answer was ${data.answer}. ${data.explanation}`;
+                    points.innerText = "STREAK LOST!";
                 }
             });
         }

@@ -8,9 +8,11 @@ import time
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_secret_key')
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'cryesix_secret_123')
 
-DB_PATH = os.getenv('DATABASE_URL', 'trigonometri.db')
+# Use absolute path for SQLite DB
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, os.getenv('DATABASE_URL', 'trigonometri.db'))
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -27,7 +29,6 @@ def learn():
 
 @app.route('/api/ai_summary', methods=['POST'])
 def ai_summary():
-    # Simple rule-based "AI" summary for trigonometry
     summary = (
         "Trigonometri Kuadran dan Sudut Istimewa:\n"
         "1. Kuadran I (0-90°): Semua fungsi (sin, cos, tan) bernilai POSITIF.\n"
@@ -47,18 +48,32 @@ def start_game():
     session['player_name'] = name
     session['score'] = 0
     session['start_time'] = time.time()
+    session['streak'] = 0
+    session['power_ups'] = ['Double Points', 'Eraser', 'Shield']
+    session['active_power_up'] = None
     
-    # Get 20 questions randomized from 50
-    db = get_db()
-    all_q = db.execute('SELECT * FROM questions').fetchall()
-    db.close()
-    
-    selected_indices = random.sample(range(len(all_q)), 20)
-    session['question_indices'] = [all_q[i]['id'] for i in selected_indices]
-    session['current_q_idx'] = 0
-    session['correct_count'] = 0
-    
-    return redirect(url_for('game'))
+    try:
+        db = get_db()
+        all_q = db.execute('SELECT id FROM questions').fetchall()
+        db.close()
+        
+        if len(all_q) < 20:
+            # If not enough questions, use what we have
+            q_count = len(all_q)
+            selected_indices = random.sample(range(q_count), q_count)
+            session['total_questions'] = q_count
+        else:
+            selected_indices = random.sample(range(len(all_q)), 20)
+            session['total_questions'] = 20
+            
+        session['question_indices'] = [all_q[i]['id'] for i in selected_indices]
+        session['current_q_idx'] = 0
+        session['correct_count'] = 0
+        
+        return redirect(url_for('game'))
+    except Exception as e:
+        print(f"Error starting game: {e}")
+        return f"Internal Server Error: {e}", 500
 
 @app.route('/game')
 def game():
@@ -66,7 +81,9 @@ def game():
         return redirect(url_for('home'))
     
     idx = session['current_q_idx']
-    if idx >= 20:
+    total = session.get('total_questions', 20)
+    
+    if idx >= total:
         return redirect(url_for('finish'))
     
     q_id = session['question_indices'][idx]
@@ -74,7 +91,26 @@ def game():
     question = db.execute('SELECT * FROM questions WHERE id = ?', (q_id,)).fetchone()
     db.close()
     
-    return render_template('game.html', question=question, q_num=idx+1)
+    if not question:
+        return "Question not found", 404
+    
+    return render_template('game.html', 
+                           question=dict(question), 
+                           q_num=idx+1, 
+                           total_q=total,
+                           power_ups=session.get('power_ups', []),
+                           streak=session.get('streak', 0),
+                           score=session.get('score', 0))
+
+@app.route('/use_powerup', methods=['POST'])
+def use_powerup():
+    power_up = request.json.get('power_up')
+    if power_up in session.get('power_ups', []):
+        session['active_power_up'] = power_up
+        session['power_ups'].remove(power_up)
+        session.modified = True
+        return jsonify({"success": True, "message": f"{power_up} Activated!"})
+    return jsonify({"success": False, "message": "Power-up not available"})
 
 @app.route('/submit_answer', methods=['POST'])
 def submit_answer():
@@ -86,17 +122,44 @@ def submit_answer():
     db.close()
     
     is_correct = (user_answer == q['answer'])
+    
+    points = 10
+    bonus = 0
+    
+    active_pu = session.get('active_power_up')
+    
     if is_correct:
+        session['streak'] += 1
         session['correct_count'] += 1
-        session['score'] += 10 # Base score
-        # Power-up simulation logic can be added here
         
+        # Streak bonus
+        if session['streak'] >= 3:
+            bonus += 5
+        
+        # Power-up effect
+        if active_pu == 'Double Points':
+            points *= 2
+            
+        session['score'] += (points + bonus)
+    else:
+        if active_pu == 'Shield':
+            # Shield prevents score loss or just counts as wrong but no streak reset?
+            # Let's say Shield keeps the streak alive once.
+            pass
+        else:
+            session['streak'] = 0
+            
+    session['active_power_up'] = None # Clear active power-up
     session['current_q_idx'] += 1
+    session.modified = True
     
     return jsonify({
         "correct": is_correct,
         "answer": q['answer'],
-        "explanation": q['explanation']
+        "explanation": q['explanation'],
+        "score": session['score'],
+        "streak": session['streak'],
+        "points_gained": points + bonus if is_correct else 0
     })
 
 @app.route('/finish')
@@ -104,24 +167,41 @@ def finish():
     player_name = session.get('player_name', 'Guest')
     score = session.get('score', 0)
     end_time = time.time()
-    time_taken = round(end_time - session.get('start_time', end_time), 2)
-    accuracy = (session.get('correct_count', 0) / 20) * 100
+    start_time = session.get('start_time', end_time)
+    time_taken = round(end_time - start_time, 2)
+    
+    total = session.get('total_questions', 20)
+    correct = session.get('correct_count', 0)
+    accuracy = (correct / total) * 100 if total > 0 else 0
     
     # Save to scoreboard
-    db = get_db()
-    db.execute('INSERT INTO scoreboard (name, score, time_taken, accuracy) VALUES (?, ?, ?, ?)',
-               (player_name, score, time_taken, accuracy))
-    db.commit()
-    db.close()
+    try:
+        db = get_db()
+        db.execute('INSERT INTO scoreboard (name, score, time_taken, accuracy) VALUES (?, ?, ?, ?)',
+                   (player_name, score, time_taken, accuracy))
+        db.commit()
+        db.close()
+    except Exception as e:
+        print(f"Error saving to scoreboard: {e}")
+        # On Vercel this might fail due to read-only DB, but we continue
     
-    return render_template('finish.html', name=player_name, score=score, time=time_taken, acc=accuracy)
+    return render_template('finish.html', 
+                           name=player_name, 
+                           score=score, 
+                           time=time_taken, 
+                           acc=accuracy,
+                           correct=correct,
+                           total=total)
 
 @app.route('/scoreboard_data')
 def scoreboard_data():
-    db = get_db()
-    scores = db.execute('SELECT * FROM scoreboard ORDER BY score DESC, time_taken ASC LIMIT 10').fetchall()
-    db.close()
-    return jsonify([dict(row) for row in scores])
+    try:
+        db = get_db()
+        scores = db.execute('SELECT * FROM scoreboard ORDER BY score DESC, time_taken ASC LIMIT 10').fetchall()
+        db.close()
+        return jsonify([dict(row) for row in scores])
+    except:
+        return jsonify([])
 
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
@@ -148,8 +228,6 @@ def admin_dashboard():
 
 @app.route('/easter_egg')
 def easter_egg():
-    # Information about Gilang Satria Pratama (cryesix_)
-    # Based on user hint and general persona
     gilang_info = {
         "name": "Gilang Satria Pratama",
         "username": "cryesix_",
@@ -166,8 +244,12 @@ def inject_school_info():
         "school_logo": "/static/img/logo_sman4.jpeg",
         "school_name": "SMAN 4 Jakarta",
         "school_loc": "Jl. Batu III No. 3, Gambir, Jakarta Pusat",
-        "project_title": "ProjectTrigonometri_X-e3-kelTIM"
+        "project_title": "TrigoQuest Quizizz Edition"
     }
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

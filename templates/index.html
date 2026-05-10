@@ -7,38 +7,46 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <img src="{{ school_logo }}" alt="Logo SMAN 4 Jakarta" class="school-logo">
-
+    <div class="overlay-dark"></div>
+    
     <div class="container">
-        <div class="cyber-panel" style="text-align: center;">
-            <h1 class="flicker">TRIGO QUEST X-E3</h1>
-            <p style="color: var(--neon-blue);">Cyberpunk Educational Game & Flashcards</p>
-            <p>Materi: Kuadran Trigonometri & Sudut Istimewa</p>
-
-            <div style="margin: 40px 0;">
-                <form action="{{ url_for('start_game') }}" method="POST">
-                    <input type="text" name="player_name" placeholder="Masukkan Namamu..." required 
-                           style="background: transparent; border: 1px solid var(--neon-blue); color: white; padding: 10px; margin-bottom: 20px; width: 80%; text-align: center;">
-                    <br>
-                    <button type="submit" class="btn btn-primary">MULAI GAME</button>
-                    <a href="{{ url_for('learn') }}" class="btn btn-secondary">BELAJAR MATERI</a>
-                </form>
+        <div class="qz-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="{{ school_logo }}" alt="Logo" class="school-logo">
+                <h3 style="margin: 0;">{{ school_name }}</h3>
             </div>
-
-            <div style="font-size: 0.8em; opacity: 0.7;">
-                <p>Bersiaplah menghadapi 20 soal tantangan dari level Easy ke Advanced!</p>
+            <div>
+                <span id="player-count">500+ Players Joined</span>
             </div>
         </div>
 
-        <div class="cyber-panel">
-            <h3>SCOREBOARD TERATAS</h3>
-            <table class="scoreboard-table" id="top-scores">
+        <div class="qz-card" style="text-align: center;">
+            <h1 style="color: var(--qz-light-purple); font-size: 2.5em; text-shadow: 2px 2px 0px rgba(0,0,0,0.1);">TRIGO QUEST</h1>
+            <p style="color: #666; font-weight: bold;">Quizizz Edition - X-E3 Kelompok TIM</p>
+            
+            <div style="margin: 40px 0;">
+                <form action="{{ url_for('start_game') }}" method="POST">
+                    <div style="margin-bottom: 20px;">
+                        <input type="text" name="player_name" placeholder="Enter your name..." required 
+                               style="width: 80%; padding: 15px; border-radius: 10px; border: 2px solid #ddd; font-size: 1.2em; text-align: center; font-family: 'Quicksand', sans-serif;">
+                    </div>
+                    <button type="submit" class="btn-qz btn-start">START GAME</button>
+                    <div style="margin-top: 15px;">
+                        <a href="{{ url_for('learn') }}" class="btn-qz btn-learn" style="width: 80%;">LEARN MATERIAL</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="qz-card">
+            <h3 style="text-align: center; color: var(--qz-light-purple);">TOP LEADERBOARD</h3>
+            <table class="sb-table">
                 <thead>
                     <tr>
-                        <th>Peringkat</th>
-                        <th>Nama</th>
-                        <th>Skor</th>
-                        <th>Waktu (s)</th>
+                        <th>RANK</th>
+                        <th>NAME</th>
+                        <th>SCORE</th>
+                        <th>TIME</th>
                     </tr>
                 </thead>
                 <tbody id="score-body">
@@ -47,27 +55,17 @@
             </table>
         </div>
 
-        <div class="credits">
-            <p>Dibuat oleh Kelompok Taman Ismail Marzuki (TIM):</p>
-            <ul class="credits-list">
-                <li>1. Aira Adekha Anfi (2)</li>
-                <li>2. Gilang Satria Pratama (10)</li>
-                <li>3. Irsanny Fadhil Kurnaefi (13)</li>
-                <li>4. Jafier Yusuf Putera (14)</li>
-                <li>5. Labib Lawahizh Ramadhani (18)</li>
-                <li>6. M. Atallah Rizal (20)</li>
-                <li>7. Raffi Putra Dwi Cahyana (26)</li>
-                <li>8. Shafira Bilqies Dermawan (30)</li>
-            </ul>
-            <p>Disusun dan diprogram oleh: <strong>Gilang Satria Pratama (10)</strong></p>
-            <p>Murid <strong>SMAN 4 Jakarta</strong> with love.</p>
-            <p style="font-size: 0.7em;">{{ school_loc }}</p>
-            
-            <div style="margin-top: 20px;">
-                <a href="{{ url_for('admin_login') }}" style="opacity: 0.2; font-size: 0.5em; text-decoration: none; color: white;">Admin Access</a>
-                | <a href="{{ url_for('easter_egg') }}" style="opacity: 0.2; font-size: 0.5em; text-decoration: none; color: white;">??</a>
-            </div>
+        <div style="text-align: center; margin-top: 30px; font-size: 0.9em; color: white; opacity: 0.8;">
+            <p>Developed by: <strong>Gilang Satria Pratama</strong> & Kelompok TIM</p>
+            <p>SMAN 4 Jakarta | 2026</p>
+            <a href="{{ url_for('admin_login') }}" style="color: white; text-decoration: none; opacity: 0.3;">Admin</a>
         </div>
+    </div>
+
+    <!-- Anime Mascot -->
+    <div class="anime-character">
+        <div class="anime-speech">"Ayo tunjukkan kemampuan trigonometrimu!"</div>
+        <img src="https://www.pngarts.com/files/12/Anime-Girl-Holding-Book-PNG-Photo.png" alt="Mascot" style="width: 100%;">
     </div>
 
     <script>
@@ -75,12 +73,16 @@
             .then(response => response.json())
             .then(data => {
                 const body = document.getElementById('score-body');
+                if (data.length === 0) {
+                    body.innerHTML = '<tr><td colspan="4">No scores yet. Be the first!</td></tr>';
+                    return;
+                }
                 data.forEach((score, index) => {
                     const row = `<tr>
                         <td>${index + 1}</td>
                         <td>${score.name}</td>
                         <td>${score.score}</td>
-                        <td>${score.time_taken}</td>
+                        <td>${score.time_taken}s</td>
                     </tr>`;
                     body.innerHTML += row;
                 });
