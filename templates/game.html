@@ -35,6 +35,12 @@
                 {{ question.question }}
             </div>
 
+            {% if question.image_url %}
+            <div style="text-align: center; margin-bottom: 20px;">
+                <img src="{{ question.image_url }}" alt="Question Image" style="max-width: 100%; max-height: 200px; border-radius: 10px; border: 2px solid var(--qz-light-purple);">
+            </div>
+            {% endif %}
+
             <div class="options-grid" id="options-container">
                 <button class="option-card opt-0" onclick="checkAnswer('{{ question.option_a }}')">{{ question.option_a }}</button>
                 <button class="option-card opt-1" onclick="checkAnswer('{{ question.option_b }}')">{{ question.option_b }}</button>

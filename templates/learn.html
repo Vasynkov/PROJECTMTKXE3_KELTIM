@@ -5,53 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learn Trigonometry - {{ project_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .study-section { margin-bottom: 40px; line-height: 1.6; }
+        .study-section h3 { border-bottom: 2px solid var(--qz-light-purple); padding-bottom: 5px; margin-bottom: 15px; color: var(--qz-light-purple); }
+        .study-img { width: 100%; max-width: 500px; border-radius: 15px; margin: 20px auto; display: block; border: 3px solid #eee; }
+        .concept-box { background: #f9f9f9; padding: 20px; border-radius: 12px; border-left: 5px solid var(--qz-blue); margin: 15px 0; }
+        .highlight { color: var(--qz-red); font-weight: bold; }
+    </style>
 </head>
 <body>
     <div class="overlay-dark"></div>
     <div class="container">
         <div class="qz-card">
-            <h2 style="color: var(--qz-light-purple); text-align: center;">STUDY MATERIAL</h2>
-            <div style="margin-top: 20px;">
-                <h3 style="color: var(--qz-blue);">1. Special Angles (Quadrant I)</h3>
-                <div style="background: var(--qz-gray); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                    <p><strong>Sin:</strong> 30°=1/2, 45°=1/2√2, 60°=1/2√3</p>
-                    <p><strong>Cos:</strong> 30°=1/2√3, 45°=1/2√2, 60°=1/2</p>
-                    <p><strong>Tan:</strong> 30°=1/3√3, 45°=1, 60°=√3</p>
-                </div>
-                
-                <h3 style="color: var(--qz-red);">2. Quadrant Relations</h3>
-                <div style="background: var(--qz-gray); padding: 15px; border-radius: 10px;">
-                    <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 10px;"><strong>Quadrant I:</strong> All Positive (+), 0-90°</li>
-                        <li style="margin-bottom: 10px;"><strong>Quadrant II:</strong> SIN Positive (+), 90-180°, Use (180-α)</li>
-                        <li style="margin-bottom: 10px;"><strong>Quadrant III:</strong> TAN Positive (+), 180-270°, Use (180+α)</li>
-                        <li style="margin-bottom: 10px;"><strong>Quadrant IV:</strong> COS Positive (+), 270-360°, Use (360-α)</li>
+            <h2 style="color: var(--qz-light-purple); text-align: center; font-size: 2em;">PANDUAN LENGKAP TRIGONOMETRI</h2>
+            <p style="text-align: center; color: #666; font-style: italic;">Materi Persiapan Ulangan, TKA, dan UTBK</p>
+            
+            <div class="study-section">
+                <h3>1. Pengenalan Sudut dan Kuadran</h3>
+                <p>Trigonometri berfokus pada hubungan antara sudut dan sisi segitiga. Dalam koordinat Kartesius, satu lingkaran penuh (360°) dibagi menjadi empat <span class="highlight">Kuadran</span>. Pemahaman tentang kuadran sangat krusial karena menentukan nilai positif atau negatif dari fungsi sinus, kosinus, dan tangen.</p>
+                <img src="https://mathcenter.id/wp-content/uploads/2018/10/kuadran-trigonometri.png" alt="Kuadran Trigonometri" class="study-img">
+                <div class="concept-box">
+                    <strong>Jembatan Keledai:</strong> "SEMUA SINdiket TANgannya KOSong"
+                    <ul>
+                        <li><strong>Kuadran I (0-90°):</strong> SEMUA (Sin, Cos, Tan) bernilai POSITIF.</li>
+                        <li><strong>Kuadran II (90-180°):</strong> Hanya SIN yang POSITIF.</li>
+                        <li><strong>Kuadran III (180-270°):</strong> Hanya TAN yang POSITIF.</li>
+                        <li><strong>Kuadran IV (270-360°):</strong> Hanya COS yang POSITIF.</li>
                     </ul>
                 </div>
             </div>
 
+            <div class="study-section">
+                <h3>2. Sudut Istimewa: Jantung Trigonometri</h3>
+                <p>Sudut istimewa adalah sudut-sudut yang nilai trigonometrinya dapat ditentukan secara eksak tanpa kalkulator. Sudut ini meliputi 0°, 30°, 45°, 60°, dan 90°. Kamu wajib menghafal nilai-nilai ini karena sering muncul di soal TKA dan ujian nasional.</p>
+                <img src="https://awsimages.detik.net.id/community/media/visual/2021/08/23/tabel-trigonometri-sudut-istimewa.png?w=600&q=90" alt="Tabel Sudut Istimewa" class="study-img">
+                <p>Perhatikan pola pada Sinus: nilainya naik dari 0 ke 1 (0, 1/2, 1/2√2, 1/2√3, 1). Kosinus adalah kebalikannya, nilainya turun dari 1 ke 0.</p>
+            </div>
+
+            <div class="study-section">
+                <h3>3. Relasi Sudut (Sudut Berelasi)</h3>
+                <p>Bagaimana cara menghitung sin 150°? Kita menggunakan relasi sudut dengan acuan 180° atau 360° agar fungsi tidak berubah.</p>
+                <div class="concept-box">
+                    <strong>Rumus Utama:</strong>
+                    <ul>
+                        <li><strong>K-II (180 - α):</strong> sin(180-α) = sin α</li>
+                        <li><strong>K-III (180 + α):</strong> tan(180+α) = tan α</li>
+                        <li><strong>K-IV (360 - α):</strong> cos(360-α) = cos α</li>
+                    </ul>
+                    <p><em>Contoh:</em> sin 150° = sin(180 - 30) = sin 30° = 1/2.</p>
+                </div>
+            </div>
+
+            <div class="study-section">
+                <h3>4. Identitas Dasar & Aturan Segitiga</h3>
+                <p>Identitas Pythagoras: <span class="highlight">sin²x + cos²x = 1</span>. Identitas ini adalah alat paling sakti untuk mencari nilai fungsi lain jika salah satu fungsi diketahui. Selain itu, pahami aturan Sinus dan Kosinus untuk menyelesaikan masalah pada segitiga sembarang.</p>
+                <img src="https://1.bp.blogspot.com/-_A2XpS_J9nI/Xp6Vl-R6OII/AAAAAAAAC9Y/yC0VjC4Z0M8k0X7v1L_C6n9_n-m5X_QCLcBGAsYHQ/s1600/aturan%2Bsinus%2Bdan%2Bcosinus.png" alt="Aturan Sinus Cosinus" class="study-img">
+            </div>
+
             <div style="margin-top: 30px; text-align: center;">
-                <h3 style="color: var(--qz-green);">AI STUDY ASSISTANT</h3>
-                <button id="ai-btn" class="btn-qz btn-learn" style="width: 100%;">GENERATE SUMMARY</button>
+                <h3 style="color: var(--qz-green);">AI STUDY ASSISTANT (Tanya Apapun)</h3>
+                <button id="ai-btn" class="btn-qz btn-learn" style="width: 100%;">GENERATE RINGKASAN STRATEGIS</button>
                 <div id="ai-result" style="margin-top: 15px; white-space: pre-line; color: #444; background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #ddd; display: none;"></div>
             </div>
 
             <div style="margin-top: 30px;">
-                <a href="{{ url_for('home') }}" class="btn-qz btn-start" style="width: 100%;">BACK TO HOME</a>
+                <a href="{{ url_for('home') }}" class="btn-qz btn-start" style="width: 100%;">KEMBALI KE LOBBY GAME</a>
             </div>
         </div>
     </div>
 
     <script>
         document.getElementById('ai-btn').onclick = function() {
-            this.innerText = "THINKING...";
+            this.innerText = "SEDANG MENGANALISIS...";
             fetch('/api/ai_summary', {method: 'POST'})
                 .then(r => r.json())
                 .then(data => {
                     const res = document.getElementById('ai-result');
-                    res.innerText = data.summary;
+                    res.innerText = "RINGKASAN UNTUK UJIAN:\n" + data.summary + "\n\nFokuslah pada latihan soal Quadrant II dan IV karena sering menjebak di tanda (+/-)!";
                     res.style.display = 'block';
-                    this.innerText = "REFRESH SUMMARY";
+                    this.innerText = "REFRESH ANALISIS";
                 });
         };
     </script>
