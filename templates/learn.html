@@ -3,96 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learn Trigonometry - {{ project_title }}</title>
+    <title>Mastery Learning: Trigonometri Lengkap - {{ project_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        .study-section { margin-bottom: 40px; line-height: 1.6; }
-        .study-section h3 { border-bottom: 2px solid var(--qz-light-purple); padding-bottom: 5px; margin-bottom: 15px; color: var(--qz-light-purple); font-family: 'Orbitron'; }
-        .study-img { width: 100%; max-width: 500px; border-radius: 15px; margin: 20px auto; display: block; border: 3px solid #eee; box-shadow: 0 0 10px rgba(0,255,255,0.3); }
-        .concept-box { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; border-left: 5px solid var(--cyber-cyan); margin: 15px 0; color: white; }
-        .highlight { color: var(--cyber-pink); font-weight: bold; }
-        .member-list { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .member-item { background: rgba(0,255,255,0.1); padding: 10px; border-radius: 8px; border: 1px solid var(--cyber-cyan); font-size: 0.9em; }
+        :root {
+            --glass-bg: rgba(13, 14, 20, 0.95);
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --text-main: #ffffff;
+            --text-muted: #b0b0b0;
+        }
+
+        body {
+            background-color: #050505;
+            color: var(--text-main);
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        .study-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 40px;
+            background: var(--glass-bg);
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.1);
+            border-radius: 20px;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 50px;
+            border-bottom: 2px solid rgba(0, 243, 255, 0.3);
+            padding-bottom: 10px;
+        }
+
+        h1 { font-size: 2.5em; text-align: center; margin-top: 0; color: var(--neon-pink); border-bottom: 4px solid var(--neon-pink); }
+
+        p, li {
+            color: #e0e0e0; /* High contrast text */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .highlight-box {
+            background: rgba(0, 243, 255, 0.05);
+            border-left: 5px solid var(--neon-blue);
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 0 15px 15px 0;
+        }
+
+        .formula-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--neon-pink);
+            font-size: 1.2em;
+            text-align: center;
+            margin: 20px 0;
+            border: 1px dashed var(--neon-pink);
+        }
+
+        .study-img {
+            width: 100%;
+            max-width: 700px;
+            display: block;
+            margin: 30px auto;
+            border-radius: 15px;
+            border: 3px solid var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+        }
+
+        .member-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .member-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--neon-blue);
+            text-align: center;
+        }
+
+        .btn-ready {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            background: var(--neon-blue);
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 1.5em;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 15px;
+            margin-top: 50px;
+            transition: 0.3s;
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        .btn-ready:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 40px var(--neon-blue);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .study-container { padding: 20px; margin: 10px; }
+            h1 { font-size: 1.8em; }
+        }
     </style>
 </head>
 <body>
-    <div class="overlay-dark"></div>
     <div class="container">
-        <div class="qz-card cyber-border">
-            <h2 style="color: var(--cyber-cyan); text-align: center; font-size: 2em; font-family: 'Orbitron';">BUKU PANDUAN TRIGONOMETRI</h2>
-            <p style="text-align: center; color: #999; font-style: italic;">Materi Resmi Bab Kuadran - TIM X-E3</p>
-            
-            <div class="study-section">
-                <h3>1. Pembagian Kuadran</h3>
-                <p>Dalam koordinat Kartesius, satu lingkaran penuh ($360^\circ$) dibagi menjadi empat bagian yang disebut <span class="highlight">Kuadran</span>. Setiap kuadran memiliki karakteristik nilai sinus, kosinus, dan tangen yang berbeda.</p>
-                <img src="https://mathcenter.id/wp-content/uploads/2018/10/kuadran-trigonometri.png" alt="Grafik Kuadran" class="study-img">
-                <div class="concept-box">
-                    <strong>Tanda Positif di Tiap Kuadran:</strong>
-                    <ul>
-                        <li><span class="highlight">Kuadran I (0°-90°):</span> SEMUA (Sin, Cos, Tan) bernilai POSITIF.</li>
-                        <li><span class="highlight">Kuadran II (90°-180°):</span> Hanya SIN bernilai POSITIF.</li>
-                        <li><span class="highlight">Kuadran III (180°-270°):</span> Hanya TAN bernilai POSITIF.</li>
-                        <li><span class="highlight">Kuadran IV (270°-360°):</span> Hanya COS bernilai POSITIF.</li>
-                    </ul>
-                    <p><em>Tips Hafal: "Semua Sindikat Tangannya Kosong"</em></p>
+        <!-- Floating Logo -->
+        <div class="school-logo-container">
+            <img src="{{ school_logo }}" alt="Logo SMAN 4 Jakarta">
+            <p>SMAN 4 JAKARTA</p>
+        </div>
+
+        <div class="study-container">
+            <h1>ENSYKLOPEDIA TRIGONOMETRI</h1>
+            <p style="text-align: center; font-style: italic; color: var(--neon-blue);">Modul Pembelajaran Mandiri - TIM X-E3</p>
+
+            <section id="intro">
+                <h2>I. Pendahuluan & Sejarah</h2>
+                <p>Selamat datang di modul pembelajaran Trigonometri. Kata <strong>Trigonometri</strong> berasal dari bahasa Yunani <em>"trigonon"</em> (tiga sudut) dan <em>"metron"</em> (mengukur). Ini adalah cabang matematika yang mempelajari hubungan antara panjang sisi dan sudut pada segitiga.</p>
+                <div class="highlight-box">
+                    <p><strong>Tahukah Kamu?</strong> Ilmuwan Muslim seperti <strong>Al-Battani</strong> dan <strong>Al-Khwarizmi</strong> berperan besar dalam memperkenalkan fungsi Sinus dan Kosinus ke dunia modern. Sebelum ada GPS, pelaut menggunakan trigonometri bintang untuk menentukan posisi mereka di tengah samudra.</p>
                 </div>
-            </div>
+            </section>
 
-            <div class="study-section">
-                <h3>2. Rumus Sudut Berelasi</h3>
-                <p>Untuk menghitung nilai trigonometri sudut di luar kuadran I, kita menggunakan relasi sudut dengan acuan $180^\circ$ atau $360^\circ$.</p>
-                <div class="concept-box">
-                    <strong>A. Kuadran II ($180^\circ - \alpha$):</strong>
-                    <ul>
-                        <li>$\sin(180^\circ - \alpha) = \sin \alpha$</li>
-                        <li>$\cos(180^\circ - \alpha) = -\cos \alpha$</li>
-                        <li>$\tan(180^\circ - \alpha) = -\tan \alpha$</li>
-                    </ul>
-                    <strong>B. Kuadran III ($180^\circ + \alpha$):</strong>
-                    <ul>
-                        <li>$\sin(180^\circ + \alpha) = -\sin \alpha$</li>
-                        <li>$\cos(180^\circ + \alpha) = -\cos \alpha$</li>
-                        <li>$\tan(180^\circ + \alpha) = \tan \alpha$</li>
-                    </ul>
-                    <strong>C. Kuadran IV ($360^\circ - \alpha$):</strong>
-                    <ul>
-                        <li>$\sin(360^\circ - \alpha) = -\sin \alpha$</li>
-                        <li>$\cos(360^\circ - \alpha) = \cos \alpha$</li>
-                        <li>$\tan(360^\circ - \alpha) = -\tan \alpha$</li>
-                    </ul>
+            <section id="quadrants">
+                <h2>II. Sistem Kuadran Kartesius</h2>
+                <p>Dalam sistem koordinat dua dimensi, satu lingkaran penuh (360 derajat) dibagi menjadi empat wilayah utama yang kita sebut sebagai kuadran.</p>
+                <img src="https://mathcenter.id/wp-content/uploads/2018/10/kuadran-trigonometri.png" alt="Sistem Kuadran" class="study-img">
+                
+                <div class="member-grid">
+                    <div class="member-card">
+                        <h3 style="margin:0; border:none; font-size:1em;">Kuadran I (0° - 90°)</h3>
+                        <p style="font-size: 0.8em;">Semua fungsi (Sin, Cos, Tan) bernilai POSITIF.</p>
+                    </div>
+                    <div class="member-card">
+                        <h3 style="margin:0; border:none; font-size:1em;">Kuadran II (90° - 180°)</h3>
+                        <p style="font-size: 0.8em;">Hanya SINUS yang bernilai POSITIF.</p>
+                    </div>
+                    <div class="member-card">
+                        <h3 style="margin:0; border:none; font-size:1em;">Kuadran III (180° - 270°)</h3>
+                        <p style="font-size: 0.8em;">Hanya TANGEN yang bernilai POSITIF.</p>
+                    </div>
+                    <div class="member-card">
+                        <h3 style="margin:0; border:none; font-size:1em;">Kuadran IV (270° - 360°)</h3>
+                        <p style="font-size: 0.8em;">Hanya KOSINUS yang bernilai POSITIF.</p>
+                    </div>
                 </div>
-            </div>
-
-            <div class="study-section">
-                <h3>3. Tabel Sudut Istimewa</h3>
-                <p>Berikut adalah nilai yang wajib dihafal untuk mempermudah perhitungan soal-soal ujian.</p>
-                <img src="https://awsimages.detik.net.id/community/media/visual/2021/08/23/tabel-trigonometri-sudut-istimewa.png?w=600&q=90" alt="Tabel Sudut Istimewa" class="study-img">
-            </div>
-
-            <div class="qz-card cyber-border" style="background: rgba(0,0,0,0.5);">
-                <h3 style="color: var(--cyber-pink); text-align: center; font-family: 'Orbitron';">🤖 GEMINI AI TUTOR</h3>
-                <div style="margin-top: 20px;">
-                    <input type="text" id="ai-topic" placeholder="Tanya soal atau materi..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--cyber-pink); background: rgba(0,0,0,0.3); color: white; margin-bottom: 10px; outline: none;">
-                    <button id="ai-ask-btn" class="btn-qz" style="width: 100%; background: var(--cyber-pink); color: white;">TANYA AI</button>
+                
+                <div class="highlight-box" style="border-left-color: var(--neon-pink);">
+                    <p><strong>Mnemonic "Semua Sindikat Tangannya Kosong":</strong><br>
+                    <strong>Semua:</strong> Kuadran I<br>
+                    <strong>Sin:</strong> Kuadran II<br>
+                    <strong>Tan:</strong> Kuadran III<br>
+                    <strong>Kos:</strong> Kuadran IV</p>
                 </div>
-                <div id="ai-response-box" class="ai-panel" style="display: none; margin-top: 20px; color: #ddd; max-height: 200px; overflow-y: auto;"></div>
-            </div>
+            </section>
 
-            <div class="qz-card" style="background: rgba(136, 84, 192, 0.1); border: 1px solid var(--qz-light-purple);">
-                <h3 style="text-align: center; color: var(--qz-light-purple); font-family: 'Orbitron';">ANGGOTA KELOMPOK (TIM)</h3>
-                <div class="member-list">
+            <section id="formulas">
+                <h2>III. Rumus Sudut Berelasi</h2>
+                <p>Ketika kita menghadapi sudut besar, kita harus "menariknya" kembali ke Kuadran I menggunakan rumus relasi. Berikut adalah panduan resminya:</p>
+                <div class="formula-card">
+                    Kuadran II: Sin(180 - α) = Sin α<br>
+                    Kuadran III: Tan(180 + α) = Tan α<br>
+                    Kuadran IV: Cos(360 - α) = Cos α
+                </div>
+                <p><em>Ingat:</em> Jika menggunakan acuan 180 atau 360, nama fungsi tetap. Jika menggunakan acuan 90 atau 270, fungsi berubah (Sin <-> Cos, Tan <-> Cot).</p>
+            </section>
+
+            <section id="special-angles">
+                <h2>IV. Tabel Sudut Istimewa</h2>
+                <p>Nilai-nilai ini adalah fondasi yang harus dihafal luar kepala untuk menguasai quiz ini.</p>
+                <img src="https://awsimages.detik.net.id/community/media/visual/2021/08/23/tabel-trigonometri-sudut-istimewa.png?w=600&q=90" alt="Tabel Istimewa" class="study-img">
+                <p>Perhatikan pola numerik pada Sinus: √0/2, √1/2, √2/2, √3/2, √4/2. Sangat simetris!</p>
+            </section>
+
+            <section id="identities">
+                <h2>V. Identitas Pythagoras</h2>
+                <p>Dalam setiap sudut x, berlaku hukum kekekalan trigonometri:</p>
+                <div class="formula-card" style="font-size: 1.5em; border-style: solid;">
+                    sin²(x) + cos²(x) = 1
+                </div>
+                <p>Ini adalah identitas paling penting yang akan kamu gunakan di soal-soal level Advanced.</p>
+            </section>
+
+            <section id="ai-assistant">
+                <h2>VI. AI Gemini Study Companion</h2>
+                <p>Masih bingung? Gunakan teknologi AI Gemini untuk menjelaskan materi spesifik yang ingin kamu dalami sebelum masuk ke arena quiz.</p>
+                <div class="qz-card cyber-border">
+                    <input type="text" id="ai-topic" placeholder="Tanyakan materi spesifik (cth: Bukti identitas pythagoras)..." 
+                           style="width: 100%; padding: 15px; background: #000; border: 1px solid var(--neon-blue); color: var(--neon-blue); margin-bottom: 15px;">
+                    <button id="ai-ask-btn" class="btn-qz btn-learn" style="width:100%;">MINTA PENJELASAN AI</button>
+                    <div id="ai-response-box" class="ai-panel" style="display:none; margin-top:20px; white-space: pre-wrap; font-size: 0.9em; border: 1px solid rgba(255,255,255,0.1); padding: 15px;"></div>
+                </div>
+            </section>
+
+            <section id="group-credits">
+                <h2>VII. Anggota Kelompok TIM (X-E3)</h2>
+                <div class="member-grid">
                     {% for member in members %}
-                    <div class="member-item">
+                    <div class="member-card">
                         <strong>{{ member.name }}</strong><br>
-                        No Absen: {{ member.no }}
+                        Absen: {{ member.no }}
                     </div>
                     {% endfor %}
                 </div>
-            </div>
+            </section>
 
-            <div style="margin-top: 30px;">
-                <a href="{{ url_for('home') }}" class="btn-qz btn-start" style="width: 100%;">BACK TO LOBBY</a>
-            </div>
+            <a href="{{ url_for('home') }}" class="btn-ready">SAYA SUDAH PAHAM, MULAI QUIZ!</a>
         </div>
     </div>
 
@@ -100,7 +233,9 @@
         document.getElementById('ai-ask-btn').onclick = function() {
             const topic = document.getElementById('ai-topic').value || 'Trigonometri';
             const resBox = document.getElementById('ai-response-box');
-            this.innerText = "SEDANG BERPIKIR...";
+            this.innerText = "MENGANALISIS DATA...";
+            this.disabled = true;
+            
             fetch('/api/gemini_study', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -110,7 +245,8 @@
             .then(data => {
                 resBox.style.display = 'block';
                 resBox.innerText = data.summary;
-                this.innerText = "TANYA AI";
+                this.innerText = "TANYA LAGI";
+                this.disabled = false;
             });
         };
     </script>
