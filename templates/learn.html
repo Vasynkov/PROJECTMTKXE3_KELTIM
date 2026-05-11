@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mastery Learning: Ensiklopedia Kuadran - {{ project_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --glass-bg: rgba(13, 14, 20, 0.95);
@@ -17,175 +18,222 @@
         body {
             background-color: #050505;
             color: var(--text-main);
-            line-height: 1.8;
-            font-size: 1.1rem;
+            line-height: 1.6;
+            font-size: 1rem;
             font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
         .study-container {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 40px;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
             background: var(--glass-bg);
             border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.1);
-            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+            border-radius: 15px;
         }
 
         h1, h2, h3 {
             font-family: 'Orbitron', sans-serif;
             color: var(--neon-blue);
             text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-top: 50px;
-            border-bottom: 2px solid rgba(0, 243, 255, 0.3);
-            padding-bottom: 10px;
+            letter-spacing: 2px;
+            margin-top: 30px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+            padding-bottom: 8px;
         }
 
-        h1 { font-size: 2.5em; text-align: center; margin-top: 0; color: var(--neon-pink); border-bottom: 4px solid var(--neon-pink); }
+        h1 { 
+            font-size: 1.8rem; 
+            text-align: center; 
+            margin-top: 0; 
+            color: var(--neon-pink); 
+            border-bottom: 3px solid var(--neon-pink); 
+            line-height: 1.2;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
 
         .highlight-box {
             background: rgba(0, 243, 255, 0.05);
-            border-left: 5px solid var(--neon-blue);
-            padding: 25px;
-            margin: 30px 0;
-            border-radius: 0 15px 15px 0;
+            border-left: 4px solid var(--neon-blue);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.95rem;
         }
 
         .formula-card {
             background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
             font-family: 'Courier New', Courier, monospace;
             color: var(--neon-pink);
-            font-size: 1.2em;
+            font-size: 1rem;
             text-align: center;
-            margin: 20px 0;
+            margin: 15px 0;
             border: 1px dashed var(--neon-pink);
+            overflow-x: auto;
         }
 
         .quadrant-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
         }
 
         .quad-card {
             background: rgba(0, 0, 0, 0.6);
             border: 1px solid var(--neon-blue);
-            padding: 20px;
-            border-radius: 15px;
+            padding: 15px;
+            border-radius: 12px;
             transition: 0.3s;
         }
 
-        .quad-card:hover { transform: translateY(-5px); border-color: var(--neon-pink); }
+        .quad-card h3 {
+            font-size: 1.1rem;
+            margin-top: 0;
+        }
 
         .btn-ready {
             display: block;
             width: 100%;
-            padding: 20px;
+            padding: 15px;
             background: var(--neon-blue);
             color: #000;
             font-family: 'Orbitron', sans-serif;
             font-weight: bold;
-            font-size: 1.5em;
+            font-size: 1.2rem;
             text-align: center;
             text-decoration: none;
-            border-radius: 15px;
-            margin-top: 50px;
+            border-radius: 10px;
+            margin-top: 30px;
             transition: 0.3s;
-            box-shadow: 0 0 20px var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue);
         }
 
-        .btn-ready:hover { transform: scale(1.02); box-shadow: 0 0 40px var(--neon-blue); }
+        .btn-ready:hover { 
+            transform: scale(1.02); 
+            box-shadow: 0 0 30px var(--neon-blue); 
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .study-container {
+                margin: 10px;
+                padding: 15px;
+            }
+            h1 { font-size: 1.5rem; }
+            h2 { font-size: 1.3rem; }
+            h3 { font-size: 1.1rem; }
+            .formula-card { font-size: 0.9rem; }
+            .btn-ready { font-size: 1.1rem; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.3rem; }
+            body { font-size: 0.95rem; }
+        }
     </style>
 </head>
 <body>
     <div class="study-container">
-        <h1>MODUL MASTER: KUADRAN TRIGONOMETRI</h1>
-        <p style="text-align: center; font-style: italic; color: var(--neon-blue);">Persiapan Latihan Soal Wayground - TIM X-E3</p>
+        <h1>ENSYKLOPEDIA TRIGONOMETRI: KUADRAN & RELASI</h1>
+        <p style="text-align: center; font-style: italic; color: var(--neon-blue); margin-bottom: 30px;">
+            Materi Lengkap Berdasarkan Kurikulum X-E3 SMAN 4 Jakarta
+        </p>
 
-        <section>
-            <h2>I. Konsep Dasar Kuadran</h2>
-            <p>Satu putaran lingkaran (360°) dibagi menjadi 4 kuadran. Kunci utama mengerjakan soal adalah menghafal nilai **POSITIF** di tiap kuadran.</p>
+        <section id="easy">
+            <h2>I. Dasar-Dasar Kuadran (Level Mudah)</h2>
+            <p>Memahami posisi sudut sangat penting. Satu putaran penuh (360°) dibagi menjadi 4 kuadran:</p>
             
             <div class="quadrant-grid">
                 <div class="quad-card">
-                    <h3 style="margin-top:0; color:var(--neon-blue);">Kuadran I</h3>
-                    <p>0° - 90°</p>
-                    <p style="color: #4ade80; font-weight: bold;">SEMUA (+) POSITIF</p>
-                    <p class="text-xs text-muted">Sin, Cos, Tan, Csc, Sec, Cot semuanya positif.</p>
+                    <h3>Kuadran I (0° - 90°)</h3>
+                    <p style="color: #4ade80; font-weight: bold;">SEMUA FUNGSI (+)</p>
+                    <p class="text-xs text-muted">Contoh: sin 60° = √3/2, cos 0° = 1.</p>
                 </div>
                 <div class="quad-card">
-                    <h3 style="margin-top:0; color:var(--neon-blue);">Kuadran II</h3>
-                    <p>90° - 180°</p>
-                    <p style="color: #4ade80; font-weight: bold;">SINUS (+) POSITIF</p>
-                    <p class="text-xs text-muted">Cos dan Tan bernilai negatif.</p>
+                    <h3>Kuadran II (90° - 180°)</h3>
+                    <p style="color: #4ade80; font-weight: bold;">SINUS (+)</p>
+                    <p class="text-xs text-muted">Contoh: sin 150° = 1/2, cos 150° = -√3/2.</p>
                 </div>
                 <div class="quad-card">
-                    <h3 style="margin-top:0; color:var(--neon-blue);">Kuadran III</h3>
-                    <p>180° - 270°</p>
-                    <p style="color: #4ade80; font-weight: bold;">TANGEN (+) POSITIF</p>
-                    <p class="text-xs text-muted">Sin dan Cos bernilai negatif.</p>
+                    <h3>Kuadran III (180° - 270°)</h3>
+                    <p style="color: #4ade80; font-weight: bold;">TANGEN (+)</p>
+                    <p class="text-xs text-muted">Contoh: tan 210° = 1/√3.</p>
                 </div>
                 <div class="quad-card">
-                    <h3 style="margin-top:0; color:var(--neon-blue);">Kuadran IV</h3>
-                    <p>270° - 360°</p>
-                    <p style="color: #4ade80; font-weight: bold;">KOSINUS (+) POSITIF</p>
-                    <p class="text-xs text-muted">Sin dan Tan bernilai negatif.</p>
+                    <h3>Kuadran IV (270° - 360°)</h3>
+                    <p style="color: #4ade80; font-weight: bold;">KOSINUS (+)</p>
+                    <p class="text-xs text-muted">Contoh: cos 315° = √2/2.</p>
                 </div>
             </div>
 
             <div class="highlight-box">
-                <p><strong>Mnemonic Cepat:</strong> "<strong>A</strong>ll <strong>S</strong>tudents <strong>T</strong>ake <strong>C</strong>alculus" atau "<strong>A</strong>sal <strong>S</strong>aja <strong>T</strong>au <strong>C</strong>aranya".<br>
-                (Q1: All, Q2: Sin, Q3: Tan, Q4: Cos)</p>
+                <p><strong>Nilai Penting:</strong> sin 90° = 1, cos 0° = 1, sin 270° = -1. Jika sudut berada tepat di garis (0, 90, 180, 270), itu disebut sudut pembatas kuadran.</p>
             </div>
         </section>
 
-        <section>
-            <h2>II. Rumus Relasi Sudut (Jembatan Kuadran)</h2>
-            <p>Untuk menghitung sudut besar seperti cos 120°, kita gunakan relasi terhadap sudut 180° atau 360° agar fungsi TIDAK berubah.</p>
+        <section id="medium">
+            <h2>II. Nilai Sudut Berelasi (Level Sedang)</h2>
+            <p>Untuk menghitung nilai di kuadran II, III, dan IV, gunakan acuan 180° atau 360° agar fungsi tetap sama:</p>
             <div class="formula-card">
-                Kuadran II (180 - α): sin(180 - α) = sin α <br>
-                Kuadran III (180 + α): tan(180 + α) = tan α <br>
-                Kuadran IV (360 - α): cos(360 - α) = cos α
+                Q-II: (180 - α) | Q-III: (180 + α) | Q-IV: (360 - α)
             </div>
-            <p><strong>Contoh Soal Easy:</strong> Berapakah nilai cos 120°?<br>
-            <em>Jawab:</em> 120° ada di Q2 (Cos negatif). cos(180 - 60) = -cos 60 = **-1/2**.</p>
+            <p><strong>Contoh Analisis:</strong><br>
+            1. <strong>cos 135°:</strong> Terletak di Q-II (cos negatif). cos(180 - 45) = -cos 45 = -√2/2.<br>
+            2. <strong>sin 210°:</strong> Terletak di Q-III (sin negatif). sin(180 + 30) = -sin 30 = -1/2.<br>
+            3. <strong>Jika sin α = 3/5 (Q-II):</strong> Gunakan Pythagoras. Sisi depan=3, miring=5, maka samping=4. Karena di Q-II, cos bernilai negatif, jadi cos α = -4/5.</p>
         </section>
 
-        <section>
-            <h2>III. Identitas & HOTS Analysis</h2>
-            <p>Pada soal tingkat lanjut (Advanced/HOTS), kamu akan sering menemui identitas Pythagoras dan analisis sudut radian.</p>
+        <section id="hard">
+            <h2>III. Identitas & Persamaan (Level Sulit)</h2>
+            <p>Gunakan Identitas Pythagoras untuk menghubungkan sin, cos, dan tan:</p>
             <div class="formula-card" style="border-style: solid; border-width: 2px;">
                 sin²x + cos²x = 1
             </div>
-            <p><strong>Analisis Radian:</strong> Ingat bahwa 1 Radian ≈ 57°. Maka sin 2 radian berarti sin(114°) yang berada di Kuadran II (Positif).</p>
-            <p><strong>Analisis Segitiga:</strong> Dalam segitiga, A + B + C = 180°. Maka cos(A+B) = cos(180 - C) = -cos C.</p>
+            <p><strong>Masalah Kompleks:</strong><br>
+            - <strong>Persamaan Kuadrat Trig:</strong> Misal 2sin²x - sin x - 1 = 0. Faktorkan menjadi (2sin x + 1)(sin x - 1) = 0. Cari nilai x yang memenuhi di setiap kuadran.<br>
+            - <strong>Relasi Penjumlahan:</strong> sin(A+B). Jika A di Q-I dan B di Q-II, hasil akhirnya bergantung pada nilai cos dan sin masing-masing sudut.</p>
         </section>
 
-        <section>
-            <h2>IV. AI Gemini Study Companion</h2>
-            <p>Butuh penjelasan lebih detail tentang soal tertentu? Tanyakan langsung pada AI Gemini kami.</p>
-            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid var(--neon-blue);">
-                <input type="text" id="ai-topic" placeholder="Contoh: Jelaskan kenapa sin 210 derajat negatif..." 
-                       style="width: 100%; padding: 15px; background: #000; border: 1px solid var(--neon-blue); color: var(--neon-blue); margin-bottom: 15px; border-radius: 10px;">
-                <button id="ai-ask-btn" class="btn-qz btn-learn" style="width:100%; padding: 15px; cursor: pointer; background: var(--neon-pink); color: white; border: none; font-weight: bold; border-radius: 10px;">MINTA PENJELASAN AI</button>
-                <div id="ai-response-box" style="display:none; margin-top:20px; white-space: pre-wrap; font-size: 0.9em; border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; background: rgba(0,0,0,0.4);"></div>
+        <section id="hots">
+            <h2>IV. Aplikasi Dunia Nyata (Level HOTS)</h2>
+            <p>Trigonometri digunakan dalam navigasi, teknik, dan fisika:</p>
+            <div class="highlight-box" style="border-left-color: var(--neon-pink);">
+                <p><strong>1. Sudut Depresi & Elevasi:</strong> Fotografer di menara (50m) melihat objek dengan sudut depresi. Gunakan tan(sudut) = depan/samping untuk mencari jarak horizontal.<br>
+                <strong>2. Komponen Vektor:</strong> Kawat antena ditarik 20m dengan sudut 210°. Komponen vertikalnya adalah y = r . sin(210) = 20 . (-1/2) = -10m.<br>
+                <strong>3. Lingkaran Satuan:</strong> Titik P(x,y) pada lingkaran. Nilai x adalah cos θ dan y adalah sin θ.</p>
             </div>
         </section>
 
-        <a href="https://wayground.com/join?gc=62541649" target="_blank" class="btn-ready">SAYA SIAP! MULAI LATIHAN DI WAYGROUND</a>
+        <section id="ai">
+            <h2>V. AI Gemini Companion</h2>
+            <p>Bingung dengan soal aplikasi menara atau vektor kawat? Tanya AI untuk langkah-langkah detailnya.</p>
+            <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; border: 1px solid var(--neon-blue);">
+                <input type="text" id="ai-topic" placeholder="Tanyakan soal HOTS (cth: Jelaskan soal antena 210 derajat)..." 
+                       style="width: 100%; padding: 12px; background: #000; border: 1px solid var(--neon-blue); color: var(--neon-blue); margin-bottom: 12px; border-radius: 8px; font-family: inherit;">
+                <button id="ai-ask-btn" class="btn-qz btn-learn" style="width:100%; padding: 12px; cursor: pointer; background: var(--neon-pink); color: white; border: none; font-weight: bold; border-radius: 8px; font-family: 'Orbitron';">MINTA ANALISIS AI</button>
+                <div id="ai-response-box" style="display:none; margin-top:20px; white-space: pre-wrap; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; background: rgba(0,0,0,0.4);"></div>
+            </div>
+        </section>
+
+        <a href="https://wayground.com/join?gc=62541649" target="_blank" class="btn-ready">SAYA SIAP! MULAI MISSION DI WAYGROUND</a>
         
-        <p style="text-align: center; margin-top: 30px; font-size: 0.8em; color: var(--text-muted);">
-            Dibuat oleh Tim Taman Ismail Marzuki (X-E3) • © 2026
+        <p style="text-align: center; margin-top: 30px; font-size: 0.8rem; color: var(--text-muted); font-weight: 300;">
+            Developed by Tim Taman Ismail Marzuki (X-E3) • SMAN 4 Jakarta
         </p>
     </div>
 
     <script>
         document.getElementById('ai-ask-btn').onclick = function() {
-            const topic = document.getElementById('ai-topic').value || 'Trigonometri';
+            const topic = document.getElementById('ai-topic').value || 'Trigonometri HOTS';
             const resBox = document.getElementById('ai-response-box');
             this.innerText = "MENGANALISIS DATA...";
             this.disabled = true;
