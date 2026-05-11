@@ -113,50 +113,15 @@ def home():
 def learn():
     return render_template('learn.html', members=GROUP_MEMBERS)
 
-@app.route('/start_game', methods=['POST'])
+@app.route('/start_game', methods=['POST', 'GET'])
 def start_game():
-    player_name = request.form.get('player_name', 'Cyber Warrior')
-    session['player_name'] = player_name
-    session['score'] = 0
-    session['start_time'] = time.time()
-    session['streak'] = 0
-    session['power_ups'] = ['50:50 Eraser', 'Double Points', 'Shield Pulse']
-    session['active_power_up'] = None
-    
-    try:
-        all_questions = engine.fetch_all_questions()
-        if not all_questions:
-            return "Fatal: Question pool empty.", 500
-        
-        # Pick 20 random questions
-        sample_size = min(20, len(all_questions))
-        selected = random.sample(all_questions, sample_size)
-        session['q_ids'] = [q['id'] for q in selected]
-        session['total_q'] = len(selected)
-        session['current_idx'] = 0
-        session['correct_count'] = 0
-        return redirect(url_for('game'))
-    except Exception as e:
-        return f"System Overload: {e}", 500
+    # User requested direct redirect to Wayground for the quiz
+    return redirect("https://quizizz.com/join?query=Trigonometri+Kuadran+Kelas+10")
 
 @app.route('/game')
 def game():
-    if 'q_ids' not in session: return redirect(url_for('home'))
-    idx = session['current_idx']
-    total = session['total_q']
-    
-    if idx >= total: return redirect(url_for('finish'))
-    
-    q_id = session['q_ids'][idx]
-    question = engine.get_question_by_id(q_id)
-    
-    return render_template('game.html', 
-                           question=question, 
-                           q_num=idx+1, 
-                           total_q=total,
-                           power_ups=session.get('power_ups'),
-                           streak=session.get('streak'),
-                           score=session.get('score'))
+    # Redirect to Wayground as well to ensure students don't use the old local game
+    return redirect("https://quizizz.com/join?query=Trigonometri+Kuadran+Kelas+10")
 
 @app.route('/submit_answer', methods=['POST'])
 def submit_answer():

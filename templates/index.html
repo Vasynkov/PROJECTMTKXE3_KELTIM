@@ -32,16 +32,12 @@
             <p style="color: var(--cyber-cyan); font-weight: bold; letter-spacing: 4px; font-family: 'Orbitron'; font-size: 0.9em;">SYSTEM_ACCESS_GRANTED</p>
             
             <div style="margin: 50px 0;">
-                <form action="{{ url_for('start_game') }}" method="POST">
-                    <div style="margin-bottom: 30px;">
-                        <input type="text" name="player_name" placeholder="ENTER AVATAR ID..." required 
-                               style="width: 85%; padding: 20px; border-radius: 15px; border: 2px solid var(--cyber-cyan); background: rgba(0,0,0,0.6); color: var(--cyber-cyan); font-size: 1.3em; text-align: center; font-family: 'Orbitron', sans-serif; outline: none;">
-                    </div>
-                    <button type="submit" class="btn-qz btn-start" style="width: 85%; padding: 20px; font-size: 1.4em;">INITIALIZE MISSION</button>
-                    <div style="margin-top: 25px;">
-                        <a href="{{ url_for('learn') }}" class="btn-qz btn-learn" style="width: 85%; padding: 15px;">ACCESS ARCHIVES (STUDY)</a>
-                    </div>
-                </form>
+                <div style="margin-bottom: 30px;">
+                    <a href="https://wayground.com/join?query=Trigonometri+Kuadran" target="_blank" class="btn-qz btn-start" style="display: block; width: 85%; padding: 20px; font-size: 1.4em; text-decoration: none; margin: 0 auto;">LATIHAN SOAL (WAYGROUND)</a>
+                </div>
+                <div style="margin-top: 25px;">
+                    <a href="{{ url_for('learn') }}" class="btn-qz btn-learn" style="display: block; width: 85%; padding: 15px; text-decoration: none; margin: 0 auto;">ACCESS ARCHIVES (STUDY)</a>
+                </div>
             </div>
         </div>
 
