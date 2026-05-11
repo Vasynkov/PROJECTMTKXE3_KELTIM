@@ -116,12 +116,12 @@ def learn():
 @app.route('/start_game', methods=['POST', 'GET'])
 def start_game():
     # User requested direct redirect to Wayground for the quiz
-    return redirect("https://quizizz.com/join?query=Trigonometri+Kuadran+Kelas+10")
+    return redirect("https://wayground.com/join?gc=62541649")
 
 @app.route('/game')
 def game():
     # Redirect to Wayground as well to ensure students don't use the old local game
-    return redirect("https://quizizz.com/join?query=Trigonometri+Kuadran+Kelas+10")
+    return redirect("https://wayground.com/join?gc=62541649")
 
 @app.route('/submit_answer', methods=['POST'])
 def submit_answer():
